@@ -1,11 +1,21 @@
 import java.util.Scanner;
 
+/**
+ * InputReader reads input problems from stdin.
+ */
 class InputReader {
 
     private Scanner sc;
 
+    /**
+     * Create a new InputReader for stdin.
+     */
     public InputReader() { sc = new Scanner(System.in); }
 
+    /**
+     * Parse a description of a packing problem from stdin.
+     * @return A PackingProblem for the input.
+     */
     public PackingProblem readProblem() {
 
         PackingSettings settings = new PackingSettings();
