@@ -12,6 +12,8 @@ class PackingSettings {
     /* The maximum height of the container. */
     public int maxHeight = Integer.MAX_VALUE;
 
+    public PackingSettings() {}
+
     public PackingSettings(boolean fixed, boolean rotation, int n) {
         this.fixed = fixed;
         this.rotation = rotation;
