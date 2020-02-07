@@ -4,7 +4,7 @@ class Rectangle {
     public boolean rotated;
 
     /**
-     * A rectangle widht a specified width and height.
+     * A rectangle with a specified width and height.
      */
     public Rectangle(int w, int h) {
         this.w = w;
