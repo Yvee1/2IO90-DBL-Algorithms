@@ -1,0 +1,30 @@
+class PackingSettings {
+    public boolean fixed;
+    public boolean rotation;
+    public int n;
+
+    public int maxHeight = Integer.MAX_VALUE;
+
+    public PackingSettings(boolean fixed, boolean rotation, int n) {
+        this.fixed = fixed;
+        this.rotation = rotation;
+        this.n = n;
+    }
+
+    public PackingSettings(boolean fixed, int maxHeight, boolean rotation, int n) {
+        this(fixed, rotation, n);
+        this.maxHeight = maxHeight;
+    }
+
+    public boolean getFixed() { return this.fixed; }
+    public void setFixed(boolean fixed) { this.fixed = fixed; }
+
+    public boolean getRotation() { return this.rotation; }
+    public void setRotation(boolean rotation) { this.rotation = rotation; }
+
+    public int getRectangleCount() { return this.n; }
+    public void setRectangeCount(int n) { this.n = n; }
+
+    public int getMaxHeight() { return this.maxHeight; }
+    public void setMaxHeight(int maxHeight) { this.maxHeight = maxHeight; }
+}
