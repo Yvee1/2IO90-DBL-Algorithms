@@ -1,8 +1,15 @@
 class PackingSettings {
+
+    /* Whether the height is fixed. */
     public boolean fixed;
+
+    /* Whether rotations are allowed. */
     public boolean rotation;
+
+    /* The number of rectangles. */
     public int n;
 
+    /* The maximum height of the container. */
     public int maxHeight = Integer.MAX_VALUE;
 
     public PackingSettings(boolean fixed, boolean rotation, int n) {
