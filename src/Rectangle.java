@@ -21,6 +21,12 @@ class Rectangle {
     public int getY() { return this.y; }
     public void setY(int y) { this.y = y; }
 
+    public int getHeight() { return this.h; }
+    public void setHeight(int height) { this.h = height;}
+
+    public int getWidth() { return this.w; }
+    public void setWidth(int width) { this.w = width; }
+
     /**
      * Rotate the rectangle by swapping width and height.
      */
