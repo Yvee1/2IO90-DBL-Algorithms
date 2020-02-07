@@ -38,11 +38,23 @@ class Rectangle {
     }
 
     /**
+     * Return the string describing the unrotated width and height.
+     * @return the string describing the unrotated width and height.
+     */
+    public String getSizeString() {
+        if (this.rotated) {
+            return String.format("%d %d", this.h, this.w);
+        } else {
+            return String.format("%d %d", this.w, this.h);
+        }
+    }
+
+    /**
      * Get a string representation of the rectangle's position.
      * @param rotation whether rotations are allowed.
      * @return The string representation of the rectangle's position.
      */
-    public String getString(boolean rotation) {
+    public String getPositionString(boolean rotation) {
         if (rotation) {
             return String.format("%s %d %d", this.rotated ? "yes" : "no", x, y);
         } else {
