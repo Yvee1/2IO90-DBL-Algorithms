@@ -32,7 +32,7 @@ class PackingSettings {
     public void setRotation(boolean rotation) { this.rotation = rotation; }
 
     public int getRectangleCount() { return this.n; }
-    public void setRectangeCount(int n) { this.n = n; }
+    public void setRectangleCount(int n) { this.n = n; }
 
     public int getMaxHeight() { return this.maxHeight; }
     public void setMaxHeight(int maxHeight) { this.maxHeight = maxHeight; }
