@@ -36,4 +36,18 @@ class Rectangle {
         this.w = this.h;
         this.h = tmp;
     }
+
+    /**
+     * Get a string representation of the rectangle's position.
+     * @param rotation whether rotations are allowed.
+     * @return The string representation of the rectangle's position.
+     */
+    public String getString(boolean rotation) {
+        if (rotation) {
+            return String.format("%s %d %d", this.rotated ? "yes" : "no", x, y);
+        } else {
+            return String.format("%d %d", this.x, this.y);
+        }
+    }
+
 }
