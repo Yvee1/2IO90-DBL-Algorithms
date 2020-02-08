@@ -23,11 +23,11 @@ public class Rectangle {
     */
     public Rectangle[] split(boolean embedPossible){
         // 30 percent of the time do a line split
-        final boolean doOneLineSplit = rand.nextDouble() < 0.1;
+        final boolean doEmbedding = rand.nextDouble() < 1;
         final boolean roomForEmbed = w > 2 && h > 2;
         final boolean roomForSplit = w > 1 && h > 1;
         
-        if (!doOneLineSplit && embedPossible && roomForEmbed){
+        if (doEmbedding && embedPossible && roomForEmbed){
             return embedRandom();
         }
         else if(roomForSplit){
@@ -44,7 +44,7 @@ public class Rectangle {
     }
     
     public Rectangle[] splitHorizontal(){
-        int splitX = rand.nextInt(w-1) + 1;
+        int splitX = r(0, w);
         // inv: 0 < splitX < w
         Rectangle r1 = new Rectangle(x, y, splitX, h);
         Rectangle r2 = new Rectangle(x + splitX, y, w - splitX, h);
@@ -52,7 +52,7 @@ public class Rectangle {
     }
     
     public Rectangle[] splitVertical(){
-        int splitY = rand.nextInt(h-1) + 1;
+        int splitY = r(0, h);
         // inv: 0 < splitY < h
         Rectangle r1 = new Rectangle(x, y, splitY, w);
         Rectangle r2 = new Rectangle(x, y + splitY, w, h - splitY);
@@ -85,29 +85,29 @@ public class Rectangle {
     // Embed rectangle inside consequently generating 5 rectangles
     public Rectangle[] embedRandom(){
         // determine lower left corner coordinates, not touching boundary
-        int xoff = rand.nextInt(w-2) + 1;
-        int yoff = rand.nextInt(h-2) + 1;
-        // xoff in [1, w-1] and yoff in [1, h-1]
+        int xoff = r(0, w);
+        int yoff = r(0, h);
+        // xoff in (0, w) and yoff in (0, h)
         
         // width and height, not touching boundary
-        int width = rand.nextInt(w-xoff-1) + 1;
-        int height = rand.nextInt(h-yoff-1) + 1;
-        // width in [1, w-xoff-1] and height in [1, h-yoff-1]
+        int w5 = r(0, w-xoff);
+        int h5 = r(0, h-yoff);
+        // width in (0, w-xoff) and height in (0, h-yoff)
         
-        Rectangle embedded = new Rectangle(x + xoff, y + yoff, width, height);
+        Rectangle embedded = new Rectangle(x + xoff, y + yoff, w5, h5);
         
         // Whether bottom left corner line is horizontal or not
         boolean blHor = rand.nextBoolean();     
         
         // widths and heights of the rectangles rectangles
-        int w1 = xoff + (blHor ? width : 0);
-        int h1 = yoff + (blHor ? 0 : height);
-        int w2 = w - xoff + (blHor ? width : 0);
-        int h2 = yoff + (blHor ? height : 0);
-        int w3 = w - xoff + (blHor ? 0 : width);
-        int h3 = h - yoff + (blHor ? height : 0);
-        int w4 = xoff + (blHor ? 0 : width);
-        int h4 = h - yoff + (blHor ? 0 : height);
+        int w1 = xoff + (blHor ? w5 : 0);
+        int h1 = yoff + (blHor ? 0 : h5);
+        int w2 = w - w1;
+        int h2 = yoff + (blHor ? h5 : 0);
+        int w3 = w - xoff - (blHor ? 0 : w5);
+        int h3 = h - h2;
+        int w4 = w - w3;
+        int h4 = h - h1;
         
         Rectangle r1 = new Rectangle(x, y, w1, h1);
         Rectangle r2 = new Rectangle(x + w - w2, y, w2, h2);
@@ -123,5 +123,15 @@ public class Rectangle {
     @Override
     public String toString(){
         return String.format("Rect at (%d, %d) with size (%d, %d)", x, y, w, h);
+    }
+    
+    // returns random number in range (lower, higher)
+    private int r(int lower, int higher) throws IllegalArgumentException {
+//        System.out.println(String.format("lower: %d, higher: %d", lower, higher));
+        if (lower == higher){
+            return lower;
+        }
+        int result = rand.nextInt(higher-lower) + lower + 1;
+        return result;
     }
 }
