@@ -23,7 +23,7 @@ public class Rectangle {
     */
     public Rectangle[] split(boolean embedPossible){
         // 30 percent of the time do a line split
-        final boolean doEmbedding = rand.nextDouble() < 1;
+        final boolean doEmbedding = rand.nextDouble() < 0.3;
         final boolean roomForEmbed = w > 2 && h > 2;
         final boolean roomForSplit = w > 1 && h > 1;
         
@@ -45,6 +45,9 @@ public class Rectangle {
     
     public Rectangle[] splitHorizontal(){
         int splitX = r(0, w);
+        if (splitX == 0){
+            System.out.println("!!!");
+        }
         // inv: 0 < splitX < w
         Rectangle r1 = new Rectangle(x, y, splitX, h);
         Rectangle r2 = new Rectangle(x + splitX, y, w - splitX, h);
@@ -54,7 +57,7 @@ public class Rectangle {
     public Rectangle[] splitVertical(){
         int splitY = r(0, h);
         // inv: 0 < splitY < h
-        Rectangle r1 = new Rectangle(x, y, splitY, w);
+        Rectangle r1 = new Rectangle(x, y, w, splitY);
         Rectangle r2 = new Rectangle(x, y + splitY, w, h - splitY);
         return new Rectangle[] {r1, r2};
     }
@@ -85,9 +88,9 @@ public class Rectangle {
     // Embed rectangle inside consequently generating 5 rectangles
     public Rectangle[] embedRandom(){
         // determine lower left corner coordinates, not touching boundary
-        int xoff = r(0, w);
-        int yoff = r(0, h);
-        // xoff in (0, w) and yoff in (0, h)
+        int xoff = r(0, w-1);
+        int yoff = r(0, h-1);
+        // xoff in (0, w-1) and yoff in (0, h-1)
         
         // width and height, not touching boundary
         int w5 = r(0, w-xoff);
@@ -131,7 +134,7 @@ public class Rectangle {
         if (lower == higher){
             return lower;
         }
-        int result = rand.nextInt(higher-lower) + lower + 1;
+        int result = rand.nextInt(higher-lower-1) + lower + 1;
         return result;
     }
 }
