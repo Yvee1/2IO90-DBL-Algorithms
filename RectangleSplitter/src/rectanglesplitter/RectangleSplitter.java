@@ -40,6 +40,7 @@ public class RectangleSplitter {
         }
         
         RectangleSplitter.outputToFile(partition);
+        RectangleSplitter.makeSolutionFile(partition);
     }
     
     private static void outputToFile(ArrayList<Rectangle> rs) throws IOException {
@@ -53,6 +54,27 @@ public class RectangleSplitter {
         for (Rectangle r : rs){
             writer.newLine();
             writer.append(r.getSize());
+        }
+        writer.close();
+    }
+    
+    private static void makeSolutionFile(ArrayList<Rectangle> rs) throws IOException {
+        final String fileName = String.format("n%d-w%d-h%d.out", n, width, height);
+        BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, false));
+        writer.append("container height: free");
+        writer.newLine();
+        writer.append("rotations allowed: no");
+        writer.newLine();
+        writer.append(String.format("number of rectangles: %d", rs.size()));
+        for (Rectangle r : rs){
+            writer.newLine();
+            writer.append(r.getSize());
+        }
+        writer.newLine();
+        writer.append("placement of rectangles");
+        for (Rectangle r : rs){
+            writer.newLine();
+            writer.append(r.getPos());
         }
         writer.close();
     }

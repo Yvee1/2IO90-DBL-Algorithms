@@ -123,6 +123,10 @@ public class Rectangle {
         return String.format("%d %d", w, h);
     }
     
+    public String getPos(){
+        return String.format("%d %d", x, y);
+    }
+    
     @Override
     public String toString(){
         return String.format("Rect at (%d, %d) with size (%d, %d)", x, y, w, h);
