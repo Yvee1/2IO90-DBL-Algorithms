@@ -1,9 +1,10 @@
+package packingsolver;
 import java.util.Scanner;
 
 /**
  * InputReader reads input problems from stdin.
  */
-class InputReader {
+public class InputReader {
 
     private Scanner sc;
 
@@ -11,6 +12,11 @@ class InputReader {
      * Create a new InputReader for stdin.
      */
     public InputReader() { sc = new Scanner(System.in); }
+    
+    /**
+     * Create a new SolutionReader with custom scanner.
+     */
+    public InputReader(Scanner sc){ this.sc = sc; }
 
     /**
      * Parse a description of a packing problem from stdin.

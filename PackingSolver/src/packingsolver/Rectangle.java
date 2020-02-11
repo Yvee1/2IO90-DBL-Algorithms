@@ -1,4 +1,5 @@
-class Rectangle {
+package packingsolver;
+public class Rectangle {
     public int w, h;
     public int x, y;
     public boolean rotated;
@@ -20,6 +21,8 @@ class Rectangle {
 
     public int getY() { return this.y; }
     public void setY(int y) { this.y = y; }
+    
+    public void setPos(int x, int y){ this.x = x; this.y = y; };
 
     public int getHeight() { return this.h; }
     public void setHeight(int height) { this.h = height;}

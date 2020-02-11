@@ -1,4 +1,5 @@
-class PackingSettings {
+package packingsolver;
+public class PackingSettings {
 
     /* Whether the height is fixed. */
     public boolean fixed = false;

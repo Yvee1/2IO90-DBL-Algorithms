@@ -1,3 +1,4 @@
+package packingsolver;
 import java.io.*;
 import java.util.*;
 class PackingSolver {

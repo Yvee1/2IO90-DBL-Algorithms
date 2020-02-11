@@ -1,3 +1,4 @@
+package packingsolver;
 /*
 A class to position a set of rectangles in a certain space such that they do not overlap and that they consume the least
 amount of space using a brute force approach
