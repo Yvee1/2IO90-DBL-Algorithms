@@ -14,8 +14,9 @@ public class FFDH implements AlgorithmInterface {
 
         //TODO: find a way to preserve the original order of rectangles.
 
-        /* Sort the rectangles by nondecreasing width. */
-        Arrays.sort(p.getRectangles(), new SortByWidthReverse());
+        /* Sort the rectangles by nonincreasing width. */
+        Arrays.sort(p.getRectangles(),
+                new ReverseSorter(new WidthSorter()));
 
         /* Create the object where the 'levels' are kept track of. */
         levels = new ArrayList<>();
