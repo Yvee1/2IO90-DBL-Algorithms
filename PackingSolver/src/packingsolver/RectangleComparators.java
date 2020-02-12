@@ -9,3 +9,11 @@ class SortByWidth implements Comparator<Rectangle> {
         return Integer.compare(a.getWidth(), b.getWidth());
     }
 }
+
+class SortByWidthReverse extends SortByWidth {
+
+    @Override
+    public int compare(Rectangle a, Rectangle b) {
+        return -1 * super.compare(a, b);
+    }
+}
