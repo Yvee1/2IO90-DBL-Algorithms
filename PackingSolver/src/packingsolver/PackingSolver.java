@@ -1,62 +1,22 @@
 package packingsolver;
-import java.io.*;
 import java.util.*;
 class PackingSolver {
     static Scanner sc;
 
     static void run() {
 
-        boolean fixed= false, rotation = false;
-        int n, maxH = 0;
+        InputReader reader = new InputReader();
 
-        int rectangles[][];
-        
-        sc.next();
-        sc.next();
-        
-        if (sc.next().equals("fixed")) {
-            fixed = true;
-            maxH = sc.nextInt();
-        }
+        PackingProblem p = reader.readProblem();
 
-        sc.next();
-        sc.next();
-        rotation = sc.next().equals("yes");
+        AlgorithmInterface ai = new FFDH();
 
-        sc.next();
-        sc.next();
-        sc.next();
+        PackingSolution sol = ai.solve(p);
 
-        n = sc.nextInt();
+        OutputPrinter printer = new OutputPrinter();
 
-        rectangles = new int[n][2];
-        
-        for (int i = 0; i < n; i++) {
-            rectangles[i][0] = sc.nextInt();
-            rectangles[i][1] = sc.nextInt();
-        }
-
-        if (fixed) {
-            System.out.printf("container height: fixed %d\n", maxH);
-        } else {
-            System.out.println("container height: free");
-        }
-
-        System.out.printf("rotations allowed: %s\n", rotation ? "yes" : "no");
-        System.out.printf("number of rectangles: %d\n", n);
-
-        for (int i = 0; i < n; i++) {
-            System.out.printf("%d %d\n", rectangles[i][0], rectangles[i][1]);
-        }
-
-        System.out.println("placement of rectangles");
-
-        for (int i = 0; i < n; i++) {
-            if (rotation) {
-                System.out.print("no ");
-            }
-            System.out.println("0 0");
-        }
+        printer.printProblem(p);
+        printer.printSolution(sol);
 
     }
 
