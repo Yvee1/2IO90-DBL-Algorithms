@@ -1,5 +1,4 @@
 package packingsolver;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -13,7 +12,7 @@ public class InputReader {
      * Create a new InputReader for stdin.
      */
     public InputReader() { sc = new Scanner(System.in); }
-    
+
     /**
      * Create a new SolutionReader with custom scanner.
      */
@@ -51,11 +50,11 @@ public class InputReader {
         int n = sc.nextInt();
         settings.setRectangleCount(n);
 
-        ArrayList<Rectangle> r = new ArrayList<>(n);
+        Rectangle[] r = new Rectangle[n];
 
         /* Read rectangles. */
         for (int i = 0; i < n; i++) {
-            r.add(new Rectangle(sc.nextInt(), sc.nextInt()));
+            r[i] = new Rectangle(sc.nextInt(), sc.nextInt());
         }
 
         return new PackingProblem(settings, r);
