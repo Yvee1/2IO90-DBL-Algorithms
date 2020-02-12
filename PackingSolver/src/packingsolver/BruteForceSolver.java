@@ -23,12 +23,42 @@ class BruteForceSolver implements AlgorithmInterface {
      */
     private PackingSolution solution;
 
+    /**
+     * The height of the solution
+     */
+    private int containerHeight;
+
+    /**
+     * Array containing the solution
+     */
+    private int[][] solutionArray;
+
+    /**
+     * the maximum width
+     */
+    private int maxWidth;
+
+    /**
+     * the final width
+     */
+    private int finalWidth;
 
     /**
      * Gets the optimal solution for an array of rectangles
      */
     public PackingSolution solve(PackingProblem p) {
         setVariables(p);
+
+        fitRectangles();
+
+        for (int i = 0; i < maxWidth; i++) {
+            if (solutionArray[i][0] != 1) {
+                finalWidth = i + 1;
+                break;
+            }
+        }
+
+        solution = new PackingSolution(finalWidth, containerHeight, rectangles);
 
         return solution;
     }
@@ -40,10 +70,87 @@ class BruteForceSolver implements AlgorithmInterface {
     private void setVariables(PackingProblem p) {
         rectangles = p.getRectangles();
         settings = p.getSettings();
+        width = 0;
 
+        /**
+         * set the maximum possible width
+         */
+        for (Rectangle r : rectangles) {
+            width += r.getWidth();
+        }
+
+        /**
+         * First we sort on the height of the rectangles
+         */
         sortArray();
 
+        /**
+         * solution has the max height
+         */
+        containerHeight = rectangles[0].getHeight();
+
+        /**
+         * Set the container appropriately
+         */
+        solutionArray = new int[maxWidth][containerHeight];
+
+
     }
+
+    /**
+     * Fits all the rectangles in the box as small as possible
+     */
+    private void fitRectangles() {
+        for (int i = 0; i < rectangles.length(); i++) {
+            int posX = 0;
+            int posY = containerHeight - 1;
+
+            /**
+             * find the first suitable x
+             */
+            while ((solutionArray[posX][posY] != 0) &&
+                    (solutionArray[posX][containerHeight - rectangles[i].getHeight)] != 1)) {
+                posX++;
+            }
+
+            posY = containerHeight - rectangles[i].getHeight;
+
+            /**
+             * Check if we can place it lower
+             */
+            while (true) {
+                if (posY > 0) {
+                    if (solutionArray[posX][posY - 1] == 0) {
+                        posY--;
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            place(rectangle, posX, posY);
+
+
+        }
+    }
+
+    /**
+     * Sets the rectangle in the grid at a certain place
+     */
+    private void placeRectangle(Rectangle r, x, y) {
+        int height = r.getHeight();
+        int width = r.getWidth();
+        r.setX(x);
+        r.setY(y);
+
+        for (int i = x; i < x + width; i++) {
+            for (int j = y; j < j + width; j++) {
+                solutionArray[i][j] = 1;
+            }
+        }
+    }
+
+
 
     /**
      * Simple algorithm to sort an array based on the height of the objects. (HEAPSORT)
@@ -109,14 +216,6 @@ class BruteForceSolver implements AlgorithmInterface {
             heapify(rectangles, heapSize, largest);
         }
     }
-
-
-
-
-
-
-
-
 
 
     /**
