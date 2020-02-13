@@ -19,7 +19,6 @@ public class SolutionReader {
      */
     public SolutionReader() { 
         sc = new Scanner(System.in);
-        ir = new InputReader();
     }
     
     /**
@@ -27,7 +26,6 @@ public class SolutionReader {
      */
     public SolutionReader(Scanner sc) { 
         this.sc = sc;
-        ir = new InputReader(sc);
     }
 
     /**
@@ -35,6 +33,7 @@ public class SolutionReader {
      * @return A PackingProblem for the input.
      */
     public PackingSolution readSolution() {
+        InputReader ir = new InputReader(sc);
         PackingProblem pp = ir.readProblem();
         
         /* Skip "placement of rectangles" */
