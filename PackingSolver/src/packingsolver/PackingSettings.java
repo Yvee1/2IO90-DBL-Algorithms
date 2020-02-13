@@ -37,4 +37,12 @@ public class PackingSettings {
 
     public int getMaxHeight() { return this.maxHeight; }
     public void setMaxHeight(int maxHeight) { this.maxHeight = maxHeight; }
+    
+    @Override
+    public String toString(){
+        return String.format("container height: %s\n"
+                + "rotations allowed: %s\n"
+                + "number of rectangles: %d", 
+                fixed ? "fixed" : "free", rotation ? "yes" : "no", n);
+    }
 }
