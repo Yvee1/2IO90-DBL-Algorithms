@@ -10,10 +10,8 @@ public class PackingProblem {
     /* Backup of the original order of the rectangles. */
     private Rectangle[] initialOrderRectangle;
 
-    public int width = 0;
-    public int height = 0;
-
-    boolean solved = false;
+    public int largestWidth;
+    public int largestHeight;
 
     public PackingProblem(PackingSettings settings, Rectangle[] rectangles) {
         this.settings = settings;
@@ -29,13 +27,9 @@ public class PackingProblem {
     public Rectangle[] getRectangles() { return this.rectangles; }
     public void setRectangles(Rectangle[] rectangles) { this.rectangles = rectangles; }
 
+    public int getLargestWidth() { return this.largestWidth; }
+    public int getLargestHeight() { return this.largestHeight; }
+
     public Rectangle[] getIdentityOrderRectangles() { return this.initialOrderRectangle; }
-
-    public void setSolution(int width, int height) {
-        this.width = width;
-        this.height = height;
-    }
-
-    public void setSolved() { solved = true; }
 
 }

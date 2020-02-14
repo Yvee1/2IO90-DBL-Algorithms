@@ -11,20 +11,27 @@ public class InputReader {
     /**
      * Create a new InputReader for stdin.
      */
-    public InputReader() { sc = new Scanner(System.in); }
+    public InputReader() {
+        sc = new Scanner(System.in);
+    }
 
     /**
      * Create a new SolutionReader with custom scanner.
      */
-    public InputReader(Scanner sc){ this.sc = sc; }
+    public InputReader(Scanner sc) {
+        this.sc = sc;
+    }
 
     /**
      * Parse a description of a packing problem from stdin.
+     *
      * @return A PackingProblem for the input.
      */
     public PackingProblem readProblem() {
 
         PackingSettings settings = new PackingSettings();
+        int largestWidth = -1;
+        int largestHeight = -1;
 
         /* Skip "container height:" */
         sc.next();
@@ -54,10 +61,18 @@ public class InputReader {
 
         /* Read rectangles. */
         for (int i = 0; i < n; i++) {
-            r[i] = new Rectangle(sc.nextInt(), sc.nextInt());
+            int width = sc.nextInt();
+            int height = sc.nextInt();
+            r[i] = new Rectangle(width, height);
+
+            if (width > largestWidth) { largestWidth = width; }
+            if (height > largestHeight) { largestHeight = height; }
         }
 
-        return new PackingProblem(settings, r);
-    }
+        PackingProblem p = new PackingProblem(settings, r);
+        p.largestWidth = largestWidth;
+        p.largestHeight = largestHeight;
 
+        return p;
+    }
 }

@@ -43,27 +43,8 @@ public class Visualizer extends Canvas  {
         } else{
             sr = new SolutionReader();
         }
-        ps = sr.readSolution();
         
-        // Make proper size window
-        final double aspectRatio = (double) ps.width / ps.height;
-        if (aspectRatio > 1){
-            windowWidth = maxWindowSize;
-            windowHeight = (int) (windowWidth / aspectRatio);
-        } else{
-            windowHeight = maxWindowSize;
-            windowWidth = (int) (windowHeight * aspectRatio);
-        }
-        
-        scaling = (double) windowWidth / ps.width;
-        
-        // preparing the window
-        JFrame frame = new JFrame("Rectangle Packing Solution");
-        Canvas canvas = new Visualizer();
-        canvas.setSize(windowWidth, windowHeight);
-        frame.add(canvas);
-        frame.pack();
-        frame.setVisible(true);
+        visualize(sr.readSolution());
     }
     
     public void paint(Graphics g) {
@@ -96,5 +77,29 @@ public class Visualizer extends Canvas  {
                   g2.setTransform(oldAT);
             }
         }
+    }
+    
+    public static void visualize(PackingSolution ps_){
+        ps = ps_;
+        
+        // Make proper size window
+        final double aspectRatio = (double) ps.width / ps.height;
+        if (aspectRatio > 1){
+            windowWidth = maxWindowSize;
+            windowHeight = (int) (windowWidth / aspectRatio);
+        } else{
+            windowHeight = maxWindowSize;
+            windowWidth = (int) (windowHeight * aspectRatio);
+        }
+        
+        scaling = (double) windowWidth / ps.width;
+        
+        // preparing the window
+        JFrame frame = new JFrame("Rectangle Packing Solution");
+        Canvas canvas = new Visualizer();
+        canvas.setSize(windowWidth, windowHeight);
+        frame.add(canvas);
+        frame.pack();
+        frame.setVisible(true);
     }
 }
