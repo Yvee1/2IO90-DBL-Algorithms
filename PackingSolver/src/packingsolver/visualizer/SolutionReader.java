@@ -5,6 +5,7 @@ import packingsolver.PackingProblem;
 import packingsolver.PackingSolution;
 import packingsolver.Rectangle;
 import packingsolver.InputReader;
+import packingsolver.PackingSettings;
 
 /**
  *
@@ -61,7 +62,7 @@ public class SolutionReader {
             rs[i].setPos(x, y);
         }
         
-        PackingSolution ps = new PackingSolution(width, height, rs);
+        PackingSolution ps = new PackingSolution(new PackingProblem(new PackingSettings(), rs), width, height);
         return ps;
     }
 }

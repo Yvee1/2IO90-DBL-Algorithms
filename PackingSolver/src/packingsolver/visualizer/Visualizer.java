@@ -19,7 +19,7 @@ import javax.swing.JFrame;
 
 /**
  *
- * @author Steven van den Broek
+ * @author 20182300
  */
 public class Visualizer extends Canvas  {
     // maximum window size
@@ -46,7 +46,7 @@ public class Visualizer extends Canvas  {
         ps = sr.readSolution();
         
         // Make proper size window
-        final double aspectRatio = (double) ps.w / ps.h;
+        final double aspectRatio = (double) ps.width / ps.height;
         if (aspectRatio > 1){
             windowWidth = maxWindowSize;
             windowHeight = (int) (windowWidth / aspectRatio);
@@ -55,7 +55,7 @@ public class Visualizer extends Canvas  {
             windowWidth = (int) (windowHeight * aspectRatio);
         }
         
-        scaling = (double) windowWidth / ps.w;
+        scaling = (double) windowWidth / ps.width;
         
         // preparing the window
         JFrame frame = new JFrame("Rectangle Packing Solution");
@@ -67,7 +67,7 @@ public class Visualizer extends Canvas  {
     }
     
     public void paint(Graphics g) {
-        for (Rectangle r : ps.solution){
+        for (Rectangle r : ps.problem.rectangles){
             final float hue = rand.nextFloat();
             // Saturation between 0.3 and 0.5
             final float saturation = (rand.nextInt(5000) + 3000) / 10000f;
@@ -95,7 +95,6 @@ public class Visualizer extends Canvas  {
                   //restore
                   g2.setTransform(oldAT);
             }
-            
         }
     }
 }

@@ -13,7 +13,7 @@ abstract class FDH implements AlgorithmInterface {
     public PackingSolution solve(PackingProblem p) {
         //TODO: find a way to preserve the original order of rectangles.
 
-        /* Sort the rectangles by nonincreasing width. */
+        /* Sort the rectangles by non-increasing width. */
         Arrays.sort(p.getRectangles(),
                 new ReverseSorter(new WidthSorter()));
 
@@ -38,7 +38,7 @@ abstract class FDH implements AlgorithmInterface {
             }
         }
 
-        return new PackingSolution(getLastLevel().endPos, p.settings.maxHeight, p.getRectangles());
+        return new PackingSolution(p, getLastLevel().endPos, p.settings.maxHeight);
     }
 
     /**
@@ -60,7 +60,7 @@ abstract class FDH implements AlgorithmInterface {
 /**
  * The class FFDH implements the First-Fit Decreasing-Height algorithm.
  */
-public class FFDH extends FDH {
+class FFDH extends FDH {
 
     /**
      * Find the first level where r fits.
@@ -92,6 +92,9 @@ class NFDH extends FDH {
     }
 }
 
+/**
+ * Represents a level in the
+ */
 class Level {
     int width;
     int height;

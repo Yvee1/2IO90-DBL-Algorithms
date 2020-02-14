@@ -7,9 +7,20 @@ public class PackingProblem {
     /* The rectangles for this problem instance. */
     public Rectangle[] rectangles;
 
+    /* Backup of the original order of the rectangles. */
+    private Rectangle[] initialOrderRectangle;
+
+    public int width = 0;
+    public int height = 0;
+
+    boolean solved = false;
+
     public PackingProblem(PackingSettings settings, Rectangle[] rectangles) {
         this.settings = settings;
         this.rectangles = rectangles;
+
+        /* clone() is a shallow copy, so Rectangle pointers are idential. */
+        this.initialOrderRectangle = this.rectangles.clone();
     }
 
     public PackingSettings getSettings() { return this.settings; }
@@ -17,5 +28,14 @@ public class PackingProblem {
 
     public Rectangle[] getRectangles() { return this.rectangles; }
     public void setRectangles(Rectangle[] rectangles) { this.rectangles = rectangles; }
+
+    public Rectangle[] getIdentityOrderRectangles() { return this.initialOrderRectangle; }
+
+    public void setSolution(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    public void setSolved() { solved = true; }
 
 }
