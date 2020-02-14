@@ -54,7 +54,6 @@ class BruteForceSolver implements AlgorithmInterface {
      */
     @Override
     public PackingSolution solve(PackingProblem p) {
-        System.out.println("started");
         setVariables(p);
 
         fitRectangles();
@@ -66,7 +65,7 @@ class BruteForceSolver implements AlgorithmInterface {
             }
         }
 
-        solution = new PackingSolution(finalWidth, containerHeight, rectangles);
+        solution = new PackingSolution(p, finalWidth, containerHeight);
 
         return solution;
     }
@@ -102,6 +101,12 @@ class BruteForceSolver implements AlgorithmInterface {
          * Set the container appropriately
          */
         solutionArray = new int[maxWidth][containerHeight];
+        
+        for (int x = 0; x < maxWidth; x++) {
+            for (int y = 0; y < containerHeight; y++) {
+                solutionArray[x][y] = 0;
+            }
+        }       
 
 
     }
@@ -117,14 +122,14 @@ class BruteForceSolver implements AlgorithmInterface {
             /**
              * find the first suitable x
              */
-            while ((solutionArray[posX][posY] != 0) &&
-                    (solutionArray[posX][containerHeight - rectangles[i].getHeight()] != 1)) {
+            
+            while ((solutionArray[posX][posY] != 0) ||
+                    (solutionArray[posX][containerHeight - rectangles[i].getHeight()] != 0)) {
                 posX++;
             }
             
             posY = containerHeight - rectangles[i].getHeight();
 
-            System.out.println(i);
             /**
              * Check if we can place it lower
              */
@@ -141,7 +146,7 @@ class BruteForceSolver implements AlgorithmInterface {
             }
             
             placeRectangle(rectangles[i], posX, posY);
-
+            
 
         }
     }
@@ -155,11 +160,12 @@ class BruteForceSolver implements AlgorithmInterface {
         r.setX(x);
         r.setY(y);
 
-        for (int i = x; i < x + width - 1; i++) {
+        for (int i = x; i < x + width; i++) {
             for (int j = y; j < y + height; j++) {
                 solutionArray[i][j] = 1;
             }
-        }
+        }      
+        
     }
 
 }
