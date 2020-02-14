@@ -1,15 +1,16 @@
 package packingsolver;
+
 public class PackingSolution {
 
-    public int w, h;
-    public Rectangle[] solution;
+    public int width, height;
+    public PackingProblem problem;
 
-    public PackingSolution(Rectangle[] solution) { this.solution = solution; }
+    public PackingSolution(PackingProblem p) { this.problem = p; }
 
-    public PackingSolution(int width, int height, Rectangle[] solution) {
-        this(solution);
-        this.w = width;
-        this.h = height;
+    public PackingSolution(PackingProblem p, int width, int height) {
+        this(p);
+        this.width = width;
+        this.height = height;
     }
 
 }

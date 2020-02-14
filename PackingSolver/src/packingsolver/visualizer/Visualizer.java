@@ -8,8 +8,6 @@ import packingsolver.Rectangle;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Random;
@@ -19,7 +17,7 @@ import javax.swing.JFrame;
 
 /**
  *
- * @author Steven van den Broek
+ * @author 20182300
  */
 public class Visualizer extends Canvas  {
     // maximum window size
@@ -46,7 +44,7 @@ public class Visualizer extends Canvas  {
         ps = sr.readSolution();
         
         // Make proper size window
-        final double aspectRatio = (double) ps.w / ps.h;
+        final double aspectRatio = (double) ps.width / ps.height;
         if (aspectRatio > 1){
             windowWidth = maxWindowSize;
             windowHeight = (int) (windowWidth / aspectRatio);
@@ -55,7 +53,7 @@ public class Visualizer extends Canvas  {
             windowWidth = (int) (windowHeight * aspectRatio);
         }
         
-        scaling = (double) windowWidth / ps.w;
+        scaling = (double) windowWidth / ps.width;
         
         // preparing the window
         JFrame frame = new JFrame("Rectangle Packing Solution");
@@ -67,35 +65,20 @@ public class Visualizer extends Canvas  {
     }
     
     public void paint(Graphics g) {
-        for (Rectangle r : ps.solution){
+        for (Rectangle r : ps.problem.getRectangles()){
             final float hue = rand.nextFloat();
             // Saturation between 0.3 and 0.5
             final float saturation = (rand.nextInt(5000) + 3000) / 10000f;
             final float luminance = 0.9f;
             final Color color = Color.getHSBColor(hue, saturation, luminance);
-            
-            Graphics2D g2 = (Graphics2D) g;
-            AffineTransform oldAT = g2.getTransform();
-            try {
-                //Move the origin to bottom-left, flip y axis
-                g2.scale(1.0, -1.0);
-                g2.translate(0, -windowHeight);
-                
-                // coloured fill
-                g.setColor(color);
-                g.fillRect((int) (r.x * scaling), (int) (r.y * scaling),
-                           (int) (r.w * scaling), (int) (r.h * scaling));
-                // black stroke
-                g.setColor(Color.BLACK);
-                g.drawRect((int) (r.x * scaling), (int) (r.y * scaling),
-                           (int) (r.w * scaling), (int) (r.h * scaling));
-
-            }
-            finally {
-                  //restore
-                  g2.setTransform(oldAT);
-            }
-            
+            // coloured fill
+            g.setColor(color);
+            g.fillRect((int) (r.x * scaling), (int) (r.y * scaling),
+                       (int) (r.w * scaling), (int) (r.h * scaling));
+            // black stroke
+            g.setColor(Color.BLACK);
+            g.drawRect((int) (r.x * scaling), (int) (r.y * scaling),
+                       (int) (r.w * scaling), (int) (r.h * scaling));
         }
     }
 }

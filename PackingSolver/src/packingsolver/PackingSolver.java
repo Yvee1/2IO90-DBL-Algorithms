@@ -9,13 +9,12 @@ class PackingSolver {
 
         PackingProblem p = reader.readProblem();
 
-        AlgorithmInterface ai = new FFDH();
+        AlgorithmInterface ai = new NFDH();
 
         PackingSolution sol = ai.solve(p);
 
         OutputPrinter printer = new OutputPrinter();
 
-        printer.printProblem(p);
         printer.printSolution(sol);
 
     }

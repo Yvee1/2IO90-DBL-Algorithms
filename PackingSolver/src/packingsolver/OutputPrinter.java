@@ -17,16 +17,19 @@ public class OutputPrinter {
     public void printProblem(PackingProblem p) {
         stream.println(p.settings.toString());
 
-        for (Rectangle r: p.getRectangles()) {
+        for (Rectangle r: p.getIdentityOrderRectangles()) {
             stream.println(r.getSizeString());
         }
     }
 
     public void printSolution(PackingSolution sol) {
+
+        printProblem(sol.problem);
+
         stream.println("placement of rectangles");
 
-        for (Rectangle r: sol.solution) {
-            stream.println(r.getPositionString(false));
+        for (Rectangle r: sol.problem.getRectangles()) {
+            stream.println(r.getPositionString(sol.problem.settings.rotation));
         }
     }
 
