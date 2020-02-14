@@ -1,4 +1,4 @@
-package packingsolver;
+
 interface AlgorithmInterface {
 
     /**

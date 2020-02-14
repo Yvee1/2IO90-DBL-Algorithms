@@ -1,4 +1,4 @@
-package packingsolver;
+
 
 public class PackingSolution {
 

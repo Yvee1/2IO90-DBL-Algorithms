@@ -1,4 +1,4 @@
-package packingsolver;
+
 public class PackingProblem {
 
     /* The settings for this problem instance. */

@@ -1,4 +1,4 @@
-package packingsolver;
+
 public class Rectangle {
     public int w, h;
     public int x, y;
