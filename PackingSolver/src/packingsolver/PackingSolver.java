@@ -10,7 +10,7 @@ class PackingSolver {
 
         PackingProblem p = reader.readProblem();
 
-        AlgorithmInterface ai = new NFDH();
+        AlgorithmInterface ai = new BruteForceSolver();
 
         PackingSolution sol = ai.solve(p);
 
