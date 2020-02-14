@@ -28,7 +28,7 @@ public class OutputPrinter {
 
         stream.println("placement of rectangles");
 
-        for (Rectangle r: sol.problem.getRectangles()) {
+        for (Rectangle r: sol.problem.getIdentityOrderRectangles()) {
             stream.println(r.getPositionString(sol.problem.settings.rotation));
         }
     }
