@@ -4,14 +4,13 @@ import java.util.Arrays;
 import java.util.ArrayList;
 
 /**
- * The class FFDH implements the First-Fit Decreasing Height algorithm.
+ * FDH represents an (...)-Fit Decreasing Height algorithm.
  */
-public class FFDH implements AlgorithmInterface {
+abstract class FDH implements AlgorithmInterface {
 
-    private ArrayList<Level> levels;
+    protected ArrayList<Level> levels;
 
     public PackingSolution solve(PackingProblem p) {
-
         //TODO: find a way to preserve the original order of rectangles.
 
         /* Sort the rectangles by nonincreasing width. */
@@ -27,7 +26,7 @@ public class FFDH implements AlgorithmInterface {
         /* Fit all rectangles. */
         for (Rectangle r: p.getRectangles()) {
 
-            Level l = firstFit(r, p.settings.maxHeight);
+            Level l = findFit(r, p.settings.maxHeight);
 
             /* If no level fits r, create a new one and add r to it. */
             if (l == null) {
@@ -43,11 +42,32 @@ public class FFDH implements AlgorithmInterface {
     }
 
     /**
+     * Find the level where r is to be fitted
+     * @param r The rectangle that needs to be fitted
+     * @param maxHeight The maximum height of any level
+     * @return A level l where l.fits(r, maxHeight). If there is no level for r, null is returned.
+     */
+    abstract Level findFit(Rectangle r, int maxHeight);
+
+    /**
+     * Return the last level.
+     * @return the Level l that is last in levels.
+     */
+    protected Level getLastLevel() { return levels.get(levels.size() - 1); }
+
+}
+
+/**
+ * The class FFDH implements the First-Fit Decreasing-Height algorithm.
+ */
+public class FFDH extends FDH {
+
+    /**
      * Find the first level where r fits.
      * @param r The rectangle to use.
      * @return A Level l where r fits. If r does not fit in any level, null is returned.
      */
-    private Level firstFit(Rectangle r, int maxHeight) {
+    protected Level findFit(Rectangle r, int maxHeight) {
 
         /* Test all levels to see if r fits. */
         for (Level l: levels) {
@@ -59,8 +79,17 @@ public class FFDH implements AlgorithmInterface {
         return null;
     }
 
-    private Level getLastLevel() { return levels.get(levels.size() - 1); }
+}
 
+/**
+ * The class NFDH implements the Next-Fit Decreasing-Height algorithm.
+ */
+class NFDH extends FDH {
+
+    protected Level findFit(Rectangle r, int maxHeight) {
+        /* NFDH only tests the last level. */
+        return getLastLevel().fits(r, maxHeight) ? getLastLevel() : null;
+    }
 }
 
 class Level {

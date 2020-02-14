@@ -1,4 +1,5 @@
 package packingsolver;
+import java.util.Arrays;
 /**
  A class to position a set of rectangles in a certain space such that they do not overlap and that they consume the least
  amount of space using a brute force approach
@@ -51,7 +52,9 @@ class BruteForceSolver implements AlgorithmInterface {
     /**
      * Gets the optimal solution for an array of rectangles
      */
+    @Override
     public PackingSolution solve(PackingProblem p) {
+        System.out.println("started");
         setVariables(p);
 
         fitRectangles();
@@ -87,7 +90,8 @@ class BruteForceSolver implements AlgorithmInterface {
         /**
          * First we sort on the height of the rectangles
          */
-        sortArray();
+        Arrays.sort(rectangles, new ReverseSorter(new HeightSorter()));
+        
 
         /**
          * solution has the max height
@@ -117,22 +121,24 @@ class BruteForceSolver implements AlgorithmInterface {
                     (solutionArray[posX][containerHeight - rectangles[i].getHeight()] != 1)) {
                 posX++;
             }
-
+            
             posY = containerHeight - rectangles[i].getHeight();
 
             /**
              * Check if we can place it lower
              */
-            while (true) {
+            boolean tempB = true;
+            while (tempB) {
+                System.out.println(posY);
                 if (posY > 0) {
                     if (solutionArray[posX][posY - 1] == 0) {
                         posY--;
-                    } else {
-                        break;
-                    }
+                    } 
+                } else {
+                    tempB = false;
                 }
             }
-
+            
             placeRectangle(rectangles[i], posX, posY);
 
 
@@ -149,127 +155,10 @@ class BruteForceSolver implements AlgorithmInterface {
         r.setY(y);
 
         for (int i = x; i < x + width; i++) {
-            for (int j = y; j < j + width; j++) {
+            for (int j = y; j < j + height; j++) {
                 solutionArray[i][j] = 1;
             }
         }
     }
 
-
-
-    /**
-     * Simple algorithm to sort an array based on the height of the objects. (HEAPSORT)
-     */
-    private void sortArray() {
-        int size = rectangles.length;
-
-        /**
-         * build a heap
-         */
-        for (int i = size/2; i >= 0; i--) {
-            heapify(size, i);
-        }
-
-        /**
-         * and then we can recursively keep getting out the max element
-         */
-        for (int i = size - 1; i >=0; i--) {
-            /**
-             * the root is the largest height
-             */
-            Rectangle temp = rectangles[0];
-            rectangles[0] = rectangles[i];
-            rectangles[i] = temp;
-
-            /**
-             * and we will heap the remaining again
-             */
-            heapify(i, 0);
-        }
-    }
-
-    /**
-     * heapify, so we sort the elements according to a max-heap
-     */
-    private void heapify(int heapSize, int i) {
-        int largest = i;
-        int leftChild = 2*i + 1;
-        int rightChild = 2*i + 2;
-
-        /**
-         * if right is larger move it down
-         */
-        if (rightChild < heapSize && rectangles[rightChild].getHeight() > rectangles[largest].getHeight()) {
-            largest = rightChild;
-        }
-
-        /**
-         * if left is larger move it down
-         */
-        if (leftChild < heapSize && rectangles[leftChild].getHeight() > rectangles[largest].getHeight()) {
-            largest = leftChild;
-        }
-
-        /**
-         * If the root is then not the largest element we swap and recurse
-         */
-        if (largest != i) {
-            Rectangle temp = rectangles[i];
-            rectangles[i] = rectangles[largest];
-            rectangles[largest] = temp;
-
-            heapify(heapSize, largest);
-        }
-    }
-
-
-    /**
-     *Check if a rectangle overlaps another rectangle
-     */
-    private boolean isValid(Rectangle r) {
-
-
-
-        for (Rectangle rectangle : rectangles) {
-            if (!areClear(r, rectangle)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private void setArea() {
-        int h = 0;
-        int w = 0;
-
-        for (Rectangle r : rectangles) {
-            h += r.getHeight();
-            w += r.getWidth();
-        }
-
-        finalHeight = h;
-        finalWidth = w;
-    }
-
-    /**
-     *Returns true when two rectangles do not overlap each other
-     */
-    private boolean areClear(Rectangle r1, Rectangle r2) {
-
-        /**
-         *If one rectangle is completely to the right of one another return true
-         */
-        if (r1.getX() > (r2.getX() + r2.getWidth()) || r2.getX() > (r1.getX() + r1.getWidth())) {
-            return true;
-        }
-
-        /**
-         *If one rectangle is completely below the other return true
-         */
-        if ((r1.getY() + r1.getHeight()) < r2.getY() || (r2.getY() + r2.getHeight()) < r1.getY()) {
-            return true;
-        }
-
-        return false;
-    }
 }
