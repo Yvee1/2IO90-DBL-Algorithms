@@ -17,6 +17,11 @@ class BruteForceSolver implements AlgorithmInterface {
     /**
      *The rectangles in the grid
      */
+    private Rectangle[] rect;
+    
+    /**
+     * A copy of the rectangles to work in
+     */
     private Rectangle[] rectangles;
 
     /**
@@ -35,6 +40,11 @@ class BruteForceSolver implements AlgorithmInterface {
     private int[][] solutionArray;
 
     /**
+     * Max rectangle width
+     */
+    private int maxRectangleWidth;
+    
+    /**
      * the maximum width
      */
     private int maxWidth;
@@ -43,11 +53,6 @@ class BruteForceSolver implements AlgorithmInterface {
      * the final width
      */
     private int finalWidth;
-    
-    /**
-     * the final height
-     */
-    private int finalHeight;
 
     /**
      * Gets the optimal solution for an array of rectangles
@@ -55,7 +60,7 @@ class BruteForceSolver implements AlgorithmInterface {
     @Override
     public PackingSolution solve(PackingProblem p) {
         setVariables(p);
-
+        
         fitRectangles();
 
         for (int i = 0; i < maxWidth; i++) {
@@ -64,18 +69,74 @@ class BruteForceSolver implements AlgorithmInterface {
                 break;
             }
         }
-
+        
+        copyInto(rectangles, rect);
         solution = new PackingSolution(p, finalWidth, containerHeight);
 
+        for (int w = finalWidth; w >= maxRectangleWidth; w--) {
+            maxWidth = w;
+            while(solution.width*solution.height > w*containerHeight) {
+                if (!doRectanglesFit(w, containerHeight)) {
+                    containerHeight++;
+                } else {
+                    copyInto(rectangles, rect);
+                    solution = new PackingSolution(p, w, containerHeight);
+                }
+            }           
+        }
         return solution;
     }
 
+    /**
+     * Check whether our rectangles fit inside the given space
+     * @param w width of the container
+     * @param h height of the container
+     * @return whether our rectangles fit inside the given space
+     */
+    private boolean doRectanglesFit(int w, int h) {
+        /**
+         * Set the container appropriately
+         */
+        solutionArray = new int[w][h];
+        
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                solutionArray[x][y] = 0;
+            }
+        }   
+        
+        return recursePlace(0);
+    }
+    
+    private boolean recursePlace(int i) {
+        if (i == rectangles.length) {
+            return true;
+        }
+        
+        for (int x = 0; x < solutionArray.length; x++) {
+            for (int y = 0; y < solutionArray[0].length; y++) {
+                if (rectanglePossible(rectangles[i], x, y)) {
+                    placeRectangle(rectangles[i], x, y);
+                    if (recursePlace(i+1)) {
+                        return true;
+                    }
+                    unplaceRectangle(rectangles[i], x, y);
+                }
+            }
+        } 
+        
+        return false;
+    }
 
     /**
      * Gather all the required data
      */
     private void setVariables(PackingProblem p) {
-        rectangles = p.getRectangles();
+        rect = p.getRectangles();
+        rectangles = new Rectangle[rect.length];
+        
+        copyInto(rect, rectangles);
+        
         settings = p.getSettings();
         maxWidth = 0;
 
@@ -85,6 +146,13 @@ class BruteForceSolver implements AlgorithmInterface {
         for (Rectangle r : rectangles) {
             maxWidth += r.getWidth();
         }
+        
+        /**
+         * First sort on the width of the rectangles for the max rectangle width
+         */
+        Arrays.sort(rectangles, new ReverseSorter(new WidthSorter()));
+        
+        maxRectangleWidth = rectangles[0].getWidth();
 
         /**
          * First we sort on the height of the rectangles
@@ -123,9 +191,15 @@ class BruteForceSolver implements AlgorithmInterface {
              * find the first suitable x
              */
             
-            while ((solutionArray[posX][posY] != 0) ||
-                    (solutionArray[posX][containerHeight - rectangles[i].getHeight()] != 0)) {
-                posX++;
+            while (true) {
+                if (solutionArray[posX][posY] != 0) {
+                    posX++;
+                } else if (rectanglePossible(rectangles[i], posX, 
+                        (containerHeight - rectangles[i].getHeight()))) {
+                    break;
+                } else {
+                    posX++;
+                }       
             }
             
             posY = containerHeight - rectangles[i].getHeight();
@@ -166,6 +240,61 @@ class BruteForceSolver implements AlgorithmInterface {
             }
         }      
         
+    }
+    
+    /**
+     * unsets the rectangle in the grid at a certain place
+     */
+    private void unplaceRectangle(Rectangle r, int x, int y) {                      
+        int height = r.getHeight();
+        int width = r.getWidth();
+        r.setX(0);
+        r.setY(0);
+
+        for (int i = x; i < x + width; i++) {
+            for (int j = y; j < y + height; j++) {
+                solutionArray[i][j] = 0;
+            }
+        }      
+        
+    }
+    
+    /**
+     * check if we can place the rectangle
+     * @param r the rectangle
+     * @param x the x-coordinate
+     * @param y the y-coordinate
+     * @return 
+     */
+    private boolean rectanglePossible(Rectangle r, int x, int y) {
+        int h = r.getHeight();
+        int w = r.getWidth();
+        
+        if ((x + w > maxWidth) || (y + h > containerHeight)) {
+            return false;
+        }
+        
+        
+        for (int i = x; i < x + w; i++) {
+            for (int j = y; j < y + h; j++) {
+                if (solutionArray[i][j] == 1) {
+                    return false;
+                }
+            }
+        }
+       
+        return true;
+    }
+    
+    /**
+     * copies r1 into r2
+     * @param r1
+     * @param r2 
+     */
+    private void copyInto(Rectangle[] r1, Rectangle[] r2) {
+        for (int i =0; i < r1.length; i++) {
+            r2[i] = new Rectangle(r1[i]);
+        }
     }
 
 }
