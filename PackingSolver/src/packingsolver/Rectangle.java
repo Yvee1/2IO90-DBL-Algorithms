@@ -16,6 +16,15 @@ public class Rectangle {
         this.rotated = false;
     }
 
+    public Rectangle(Rectangle r) {
+        this.w = r.w;
+        this.h = r.h;
+
+        this.x = r.x;
+        this.y = r.y;
+        this.rotated = r.rotated;
+    }
+
     public int getX() { return this.x; }
     public void setX(int x) { this.x = x; }
 
