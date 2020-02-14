@@ -17,7 +17,7 @@ public class OutputPrinter {
     public void printProblem(PackingProblem p) {
         stream.println(p.settings.toString());
 
-        for (Rectangle r: p.getIdentityOrderRectangles()) {
+        for (Rectangle r: p.getRectangles()) {
             stream.println(r.getSizeString());
         }
     }
@@ -28,7 +28,7 @@ public class OutputPrinter {
 
         stream.println("placement of rectangles");
 
-        for (Rectangle r: sol.problem.getIdentityOrderRectangles()) {
+        for (Rectangle r: sol.problem.getRectangles()) {
             stream.println(r.getPositionString(sol.problem.settings.rotation));
         }
     }
