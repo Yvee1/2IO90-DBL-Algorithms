@@ -1,8 +1,3 @@
-/*
- * Here comes the text of your license
- * Each line should be prefixed with  * 
- */
-
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
