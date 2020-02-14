@@ -8,6 +8,8 @@ import packingsolver.Rectangle;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Random;
@@ -17,7 +19,7 @@ import javax.swing.JFrame;
 
 /**
  *
- * @author 20182300
+ * @author Steven van den Broek
  */
 public class Visualizer extends Canvas  {
     // maximum window size
@@ -71,14 +73,29 @@ public class Visualizer extends Canvas  {
             final float saturation = (rand.nextInt(5000) + 3000) / 10000f;
             final float luminance = 0.9f;
             final Color color = Color.getHSBColor(hue, saturation, luminance);
-            // coloured fill
-            g.setColor(color);
-            g.fillRect((int) (r.x * scaling), (int) (r.y * scaling),
-                       (int) (r.w * scaling), (int) (r.h * scaling));
-            // black stroke
-            g.setColor(Color.BLACK);
-            g.drawRect((int) (r.x * scaling), (int) (r.y * scaling),
-                       (int) (r.w * scaling), (int) (r.h * scaling));
+            
+            Graphics2D g2 = (Graphics2D) g;
+            AffineTransform oldAT = g2.getTransform();
+            try {
+                //Move the origin to bottom-left, flip y axis
+                g2.scale(1.0, -1.0);
+                g2.translate(0, -windowHeight);
+                
+                // coloured fill
+                g.setColor(color);
+                g.fillRect((int) (r.x * scaling), (int) (r.y * scaling),
+                           (int) (r.w * scaling), (int) (r.h * scaling));
+                // black stroke
+                g.setColor(Color.BLACK);
+                g.drawRect((int) (r.x * scaling), (int) (r.y * scaling),
+                           (int) (r.w * scaling), (int) (r.h * scaling));
+
+            }
+            finally {
+                  //restore
+                  g2.setTransform(oldAT);
+            }
+            
         }
     }
 }
