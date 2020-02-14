@@ -21,6 +21,14 @@ class WidthSorter extends RectangleSorter {
     }
 }
 
+class HeightSorter extends RectangleSorter {
+
+    @Override
+    public int compare(Rectangle a, Rectangle b) {
+        return Integer.compare(a.getHeight(), b.getHeight());
+    }
+}
+
 /**
  * Sort in the reverse order of the supplied RectangleSorter.
  */
