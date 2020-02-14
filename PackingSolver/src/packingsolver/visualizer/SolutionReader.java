@@ -49,6 +49,16 @@ public class SolutionReader {
         int height = 0;
         
         for (int i = 0; i < n; i++){
+            boolean rotated = false;
+            if (pp.settings.rotation){
+                final String word = sc.next();
+                if (word.equals("yes")){
+                    rotated = true;
+                } else if (word.equals("no")){
+                    rotated = false;
+                }
+            }
+            
             final int x = sc.nextInt();
             final int y = sc.nextInt();
             
@@ -60,6 +70,9 @@ public class SolutionReader {
             }
             
             rs[i].setPos(x, y);
+            if (rotated){
+                rs[i].rotate();
+            }
         }
         
         PackingSolution ps = new PackingSolution(new PackingProblem(new PackingSettings(), rs), width, height);
