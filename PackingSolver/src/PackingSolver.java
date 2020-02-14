@@ -23,7 +23,7 @@ class PackingSolver {
         OutputPrinter printer = new OutputPrinter();
 
         printer.printSolution(sol);
-        //Visualizer.visualize(sol);
+        Visualizer.visualize(sol);
     }
 
     public static void main(String args[]) {
