@@ -39,6 +39,10 @@ public class Rectangle {
     public int getWidth() { return this.w; }
     public void setWidth(int width) { this.w = width; }
 
+    public int getArea() {
+        return this.w * this.h;
+    }
+
     /**
      * Rotate the rectangle by swapping width and height.
      */

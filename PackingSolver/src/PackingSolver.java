@@ -16,7 +16,7 @@ class PackingSolver {
 
         if (p.rectangles.length <= 4) {
             ai  = new BruteForceSolver();
-        } else { ai = new NFDH(); }
+        } else { ai = new SteinbergSolver(); }
 
         PackingSolution sol = ai.solve(p);
 
