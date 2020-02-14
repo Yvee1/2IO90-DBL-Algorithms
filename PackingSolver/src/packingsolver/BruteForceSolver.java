@@ -51,7 +51,9 @@ class BruteForceSolver implements AlgorithmInterface {
     /**
      * Gets the optimal solution for an array of rectangles
      */
+    @Override
     public PackingSolution solve(PackingProblem p) {
+        System.out.println("started");
         setVariables(p);
 
         fitRectangles();
@@ -117,22 +119,25 @@ class BruteForceSolver implements AlgorithmInterface {
                     (solutionArray[posX][containerHeight - rectangles[i].getHeight()] != 1)) {
                 posX++;
             }
-
+            
+            System.out.println(posY);
+            
             posY = containerHeight - rectangles[i].getHeight();
 
             /**
              * Check if we can place it lower
              */
-            while (true) {
+            boolean tempB = true;
+            while (tempB) {
                 if (posY > 0) {
                     if (solutionArray[posX][posY - 1] == 0) {
                         posY--;
                     } else {
-                        break;
+                        tempB = false;
                     }
                 }
             }
-
+            System.out.println(i);
             placeRectangle(rectangles[i], posX, posY);
 
 
@@ -149,7 +154,7 @@ class BruteForceSolver implements AlgorithmInterface {
         r.setY(y);
 
         for (int i = x; i < x + width; i++) {
-            for (int j = y; j < j + width; j++) {
+            for (int j = y; j < j + height; j++) {
                 solutionArray[i][j] = 1;
             }
         }
@@ -220,56 +225,5 @@ class BruteForceSolver implements AlgorithmInterface {
 
             heapify(heapSize, largest);
         }
-    }
-
-
-    /**
-     *Check if a rectangle overlaps another rectangle
-     */
-    private boolean isValid(Rectangle r) {
-
-
-
-        for (Rectangle rectangle : rectangles) {
-            if (!areClear(r, rectangle)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private void setArea() {
-        int h = 0;
-        int w = 0;
-
-        for (Rectangle r : rectangles) {
-            h += r.getHeight();
-            w += r.getWidth();
-        }
-
-        finalHeight = h;
-        finalWidth = w;
-    }
-
-    /**
-     *Returns true when two rectangles do not overlap each other
-     */
-    private boolean areClear(Rectangle r1, Rectangle r2) {
-
-        /**
-         *If one rectangle is completely to the right of one another return true
-         */
-        if (r1.getX() > (r2.getX() + r2.getWidth()) || r2.getX() > (r1.getX() + r1.getWidth())) {
-            return true;
-        }
-
-        /**
-         *If one rectangle is completely below the other return true
-         */
-        if ((r1.getY() + r1.getHeight()) < r2.getY() || (r2.getY() + r2.getHeight()) < r1.getY()) {
-            return true;
-        }
-
-        return false;
     }
 }
