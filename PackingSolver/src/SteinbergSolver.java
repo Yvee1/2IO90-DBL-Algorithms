@@ -37,8 +37,7 @@ public class SteinbergSolver implements AlgorithmInterface {
     }
 
     private void subProblem(Rectangle boundingBox, List<Rectangle> list) {
-        System.out.println("x: " + boundingBox.getX() + " y: " + boundingBox.getY() + " w: " + boundingBox.getWidth() + " h: " + boundingBox.getHeight() + " l: " + list.size());
-        if (list.size() == 0) { System.out.println("Terminated"); return; }
+        if (list.size() == 0) { return; }
         if (condition1(boundingBox, list)) { procedure1(boundingBox, list); }
         else if (conditionm1(boundingBox, list)) { procedurem1(boundingBox, list); }
         else if (condition3(boundingBox, list)) { procedure3(boundingBox, list); }
@@ -52,11 +51,10 @@ public class SteinbergSolver implements AlgorithmInterface {
         Apply procedure 0
      */
     private void procedure0(Rectangle boundingBox, List<Rectangle> list) {
-        System.out.println("Procedure 0");
         List<Rectangle> l = new ArrayList<>(list);
         placeRelative(boundingBox, l.get(condition0variable_i), 0, 0);
         l.remove(condition0variable_i);
-        if (l.size() == 0) { System.out.println("Terminated"); return; }
+        if (l.size() == 0) { return; }
         Rectangle Q = new Rectangle(boundingBox.getWidth() - list.get(condition0variable_i).getWidth(),
                 boundingBox.getHeight());
         placeRelative(boundingBox, Q, list.get(condition0variable_i).getWidth(), 0);
@@ -87,7 +85,6 @@ public class SteinbergSolver implements AlgorithmInterface {
         Apply procedure 2
      */
     private void procedure2(Rectangle boundingBox, List<Rectangle> list) {
-        System.out.println("Procedure 2");
         if (list.get(condition2variable_i).getWidth() < list.get(condition2variable_k).getWidth()) {
             int temp = condition2variable_i;
             condition2variable_i = condition2variable_k;
@@ -100,7 +97,7 @@ public class SteinbergSolver implements AlgorithmInterface {
         List<Rectangle> l = new ArrayList<>(list);
         l.remove(ri);
         l.remove(rk);
-        if (l.size() == 0) { System.out.println("Terminated"); return; }
+        if (l.size() == 0) { return; }
         Rectangle Q = new Rectangle(boundingBox.getWidth() - ri.getWidth(), boundingBox.getHeight());
         placeRelative(boundingBox, Q, ri.getWidth(), 0);
         subProblem(Q, l);
@@ -110,7 +107,6 @@ public class SteinbergSolver implements AlgorithmInterface {
         Apply procedure -2
      */
     private void procedurem2(Rectangle boundingBox, List<Rectangle> list) {
-        System.out.println("Procedure -2");
         if (list.get(conditionm2variable_i).getHeight() < list.get(conditionm2variable_k).getHeight()) {
             int temp = conditionm2variable_i;
             conditionm2variable_i = conditionm2variable_k;
@@ -123,7 +119,7 @@ public class SteinbergSolver implements AlgorithmInterface {
         List<Rectangle> l = new ArrayList<>(list);
         l.remove(ri);
         l.remove(rk);
-        if (l.size() == 0) { System.out.println("Terminated"); return; }
+        if (l.size() == 0) { return; }
         Rectangle Q = new Rectangle(boundingBox.getWidth(), boundingBox.getHeight() - ri.getHeight());
         placeRelative(boundingBox, Q, 0, ri.getHeight());
         subProblem(Q, l);
@@ -207,11 +203,9 @@ public class SteinbergSolver implements AlgorithmInterface {
         Apply procedure 3
      */
     private void procedure3(Rectangle boundingBox, List<Rectangle> list) {
-        System.out.println("Procedure 3");
         int Z = getTotalArea(list, condition3variable_m);
         int up = Math.max(boundingBox.getWidth() / 2, 2 * Z / boundingBox.getHeight());
         int upp = Math.min(boundingBox.getWidth() / 2, boundingBox.getWidth() - (2 * Z / boundingBox.getHeight()));
-        System.out.println("u': " + up + " u'': " + upp); System.out.println(condition3variable_m);
         int v = boundingBox.getHeight();
         List<Rectangle> l1 = new ArrayList<>();
         List<Rectangle> l2 = new ArrayList<>(list);
@@ -219,7 +213,6 @@ public class SteinbergSolver implements AlgorithmInterface {
             l1.add(list.get(i));
             l2.remove(list.get(i));
         }
-        System.out.println("l1: " + l1.size() + " l2: " + l2.size());
         Rectangle Q1 = new Rectangle(up, v);
         placeRelative(boundingBox, Q1, 0, 0);
         Rectangle Q2 = new Rectangle(upp, v);
@@ -232,7 +225,7 @@ public class SteinbergSolver implements AlgorithmInterface {
         Apply procedure -3
      */
     private void procedurem3(Rectangle boundingBox, List<Rectangle> list) {
-        System.out.println("Procedure -3");
+        int listLength = list.size();
         int Z = getTotalArea(list, conditionm3variable_m);
         int vp = Math.max(boundingBox.getHeight() / 2, 2 * Z / boundingBox.getWidth());
         int vpp = Math.min(boundingBox.getHeight() / 2, boundingBox.getHeight() - (2 * Z / boundingBox.getWidth()));
@@ -313,7 +306,6 @@ public class SteinbergSolver implements AlgorithmInterface {
         Apply procedure 1
      */
     private void procedure1(Rectangle boundingBox, List<Rectangle> list) {
-        System.out.println("Procedure 1");
         List<Rectangle> l = new ArrayList<>(list);
         // Get all rectangles wider than half the width of subproblem
         l.sort(Comparator.comparing(Rectangle::getWidth).reversed());
@@ -331,7 +323,7 @@ public class SteinbergSolver implements AlgorithmInterface {
         }
         // If all rectangles placed, return
         if (m == list.size() - 1) {
-            System.out.println("Terminated"); return;
+            return;
         }
         // Else sort remaining rectangles by decreasing height
         tempList.sort(Comparator.comparing(Rectangle::getHeight).reversed());
@@ -356,8 +348,6 @@ public class SteinbergSolver implements AlgorithmInterface {
                 Rectangle Q = new Rectangle(boundingBox.getWidth() - w, boundingBox.getHeight() - h);
                 placeRelative(boundingBox, Q, 0, h);
                 subProblem(Q, remainder);
-            } else {
-                System.out.println("Terminated");
             }
         }
     }
@@ -366,7 +356,6 @@ public class SteinbergSolver implements AlgorithmInterface {
         Apply procedure -1
      */
     private void procedurem1(Rectangle boundingBox, List<Rectangle> list) {
-        System.out.println("Procedure -1");
         List<Rectangle> l = new ArrayList<>(list);
         // Get all rectangles longer than half the height of subproblem
         l.sort(Comparator.comparing(Rectangle::getHeight).reversed());
@@ -384,7 +373,7 @@ public class SteinbergSolver implements AlgorithmInterface {
         }
         // If all rectangles places, return
         if (m == list.size() - 1) {
-            System.out.println("Terminated"); return;
+            return;
         }
         // Else sort remaining rectangles by decreasing width
         tempList.sort(Comparator.comparing(Rectangle::getHeight).reversed());
@@ -409,8 +398,6 @@ public class SteinbergSolver implements AlgorithmInterface {
                 Rectangle Q = new Rectangle(boundingBox.getWidth() - w, boundingBox.getHeight() - h);
                 placeRelative(boundingBox, Q, w, 0);
                 subProblem(Q, remainder);
-            } else {
-                System.out.println("Terminated");
             }
         }
     }
@@ -448,7 +435,10 @@ public class SteinbergSolver implements AlgorithmInterface {
             int mHeight = getMaxHeight(rectangles);
             int mWidth = getMaxWidth(rectangles);
             while(!(2 * S <= (u * v) - (Math.max(2*mWidth - u, 0) * Math.max(2*mHeight - v, 0)))) {
-                v++; u++;
+                v++;
+                if(!(2 * S <= (u * v) - (Math.max(2*mWidth - u, 0) * Math.max(2*mHeight - v, 0)))) {
+                    u++;
+                }
             }
             boundingBox.setWidth(u);
             boundingBox.setHeight(v);
