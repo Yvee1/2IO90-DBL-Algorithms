@@ -43,6 +43,6 @@ public class PackingSettings {
         return String.format("container height: %s\n"
                 + "rotations allowed: %s\n"
                 + "number of rectangles: %d", 
-                fixed ? "fixed" : "free", rotation ? "yes" : "no", n);
+                fixed ? "fixed " + maxHeight : "free", rotation ? "yes" : "no", n);
     }
 }
