@@ -124,18 +124,19 @@ class BruteForceSolver implements AlgorithmInterface {
             
             posY = containerHeight - rectangles[i].getHeight();
 
+            System.out.println(i);
             /**
              * Check if we can place it lower
              */
-            boolean tempB = true;
-            while (tempB) {
-                System.out.println(posY);
+            while (true) {
                 if (posY > 0) {
                     if (solutionArray[posX][posY - 1] == 0) {
                         posY--;
-                    } 
+                    } else {
+                        break;
+                    }
                 } else {
-                    tempB = false;
+                    break;
                 }
             }
             
@@ -148,14 +149,14 @@ class BruteForceSolver implements AlgorithmInterface {
     /**
      * Sets the rectangle in the grid at a certain place
      */
-    private void placeRectangle(Rectangle r, int x, int y) {
+    private void placeRectangle(Rectangle r, int x, int y) {                      
         int height = r.getHeight();
         int width = r.getWidth();
         r.setX(x);
         r.setY(y);
 
-        for (int i = x; i < x + width; i++) {
-            for (int j = y; j < j + height; j++) {
+        for (int i = x; i < x + width - 1; i++) {
+            for (int j = y; j < y + height; j++) {
                 solutionArray[i][j] = 1;
             }
         }
