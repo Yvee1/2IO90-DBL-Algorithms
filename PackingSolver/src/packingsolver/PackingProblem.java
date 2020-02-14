@@ -10,6 +10,9 @@ public class PackingProblem {
     /* Backup of the original order of the rectangles. */
     private Rectangle[] initialOrderRectangle;
 
+    public int largestWidth;
+    public int largestHeight;
+
     public PackingProblem(PackingSettings settings, Rectangle[] rectangles) {
         this.settings = settings;
         this.rectangles = rectangles;
@@ -23,6 +26,9 @@ public class PackingProblem {
 
     public Rectangle[] getRectangles() { return this.rectangles; }
     public void setRectangles(Rectangle[] rectangles) { this.rectangles = rectangles; }
+
+    public int getLargestWidth() { return this.largestWidth; }
+    public int getLargestHeight() { return this.largestHeight; }
 
     public Rectangle[] getIdentityOrderRectangles() { return this.initialOrderRectangle; }
 
