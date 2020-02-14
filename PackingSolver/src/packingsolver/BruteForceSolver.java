@@ -1,4 +1,5 @@
 package packingsolver;
+import java.util.Arrays;
 /**
  A class to position a set of rectangles in a certain space such that they do not overlap and that they consume the least
  amount of space using a brute force approach
@@ -89,7 +90,8 @@ class BruteForceSolver implements AlgorithmInterface {
         /**
          * First we sort on the height of the rectangles
          */
-        sortArray();
+        Arrays.sort(rectangles, new ReverseSorter(new HeightSorter()));
+        
 
         /**
          * solution has the max height
@@ -120,8 +122,6 @@ class BruteForceSolver implements AlgorithmInterface {
                 posX++;
             }
             
-            System.out.println(posY);
-            
             posY = containerHeight - rectangles[i].getHeight();
 
             /**
@@ -129,15 +129,16 @@ class BruteForceSolver implements AlgorithmInterface {
              */
             boolean tempB = true;
             while (tempB) {
+                System.out.println(posY);
                 if (posY > 0) {
                     if (solutionArray[posX][posY - 1] == 0) {
                         posY--;
-                    } else {
-                        tempB = false;
-                    }
+                    } 
+                } else {
+                    tempB = false;
                 }
             }
-            System.out.println(i);
+            
             placeRectangle(rectangles[i], posX, posY);
 
 
@@ -160,70 +161,4 @@ class BruteForceSolver implements AlgorithmInterface {
         }
     }
 
-
-
-    /**
-     * Simple algorithm to sort an array based on the height of the objects. (HEAPSORT)
-     */
-    private void sortArray() {
-        int size = rectangles.length;
-
-        /**
-         * build a heap
-         */
-        for (int i = size/2; i >= 0; i--) {
-            heapify(size, i);
-        }
-
-        /**
-         * and then we can recursively keep getting out the max element
-         */
-        for (int i = size - 1; i >=0; i--) {
-            /**
-             * the root is the largest height
-             */
-            Rectangle temp = rectangles[0];
-            rectangles[0] = rectangles[i];
-            rectangles[i] = temp;
-
-            /**
-             * and we will heap the remaining again
-             */
-            heapify(i, 0);
-        }
-    }
-
-    /**
-     * heapify, so we sort the elements according to a max-heap
-     */
-    private void heapify(int heapSize, int i) {
-        int largest = i;
-        int leftChild = 2*i + 1;
-        int rightChild = 2*i + 2;
-
-        /**
-         * if right is larger move it down
-         */
-        if (rightChild < heapSize && rectangles[rightChild].getHeight() > rectangles[largest].getHeight()) {
-            largest = rightChild;
-        }
-
-        /**
-         * if left is larger move it down
-         */
-        if (leftChild < heapSize && rectangles[leftChild].getHeight() > rectangles[largest].getHeight()) {
-            largest = leftChild;
-        }
-
-        /**
-         * If the root is then not the largest element we swap and recurse
-         */
-        if (largest != i) {
-            Rectangle temp = rectangles[i];
-            rectangles[i] = rectangles[largest];
-            rectangles[largest] = temp;
-
-            heapify(heapSize, largest);
-        }
-    }
 }
