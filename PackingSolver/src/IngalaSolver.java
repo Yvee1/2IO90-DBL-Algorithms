@@ -2,6 +2,8 @@
 import java.util.ArrayList;
 
 public class IngalaSolver implements AlgorithmInterface {
+    PackingProblem pp;
+    
     // large constant
     final int C = 1000;
     
@@ -44,6 +46,18 @@ public class IngalaSolver implements AlgorithmInterface {
     }
     
     private CategorizedRectangle[] crs;
+    private ArrayList<CategorizedRectangle> largeRs;
+    private ArrayList<CategorizedRectangle> tallRs;
+    private ArrayList<CategorizedRectangle> verticalRs;
+    private ArrayList<CategorizedRectangle> horizontalRs;
+    private ArrayList<CategorizedRectangle> smallRs;
+//    private ArrayList<CategorizedRectangle> nonSmallRs;
+//    private ArrayList<CategorizedRectangle> LTV;
+    private ArrayList<CategorizedRectangle> mediumRs;
+    // Rectangles in set A := {R is Medium | height in (muH*OPT, deltaH*OPT)}
+    private ArrayList<CategorizedRectangle> A;
+    // nonA = mediumRs - A
+    private ArrayList<CategorizedRectangle> nonA;
     
     private double f(double x){
         return Math.pow(epsilon * x, C / (epsilon*x));
@@ -51,6 +65,7 @@ public class IngalaSolver implements AlgorithmInterface {
     
     @Override
     public PackingSolution solve(PackingProblem p){
+        this.pp = p;
         // set some variables
         W = p.getSettings().getMaxHeight();
         final Rectangle[] rs = p.getRectangles();
@@ -58,56 +73,144 @@ public class IngalaSolver implements AlgorithmInterface {
         // categorize rectangles
         crs = new CategorizedRectangle[rs.length];
         for (int i = 0; i < rs.length; i++){
-            crs[i] = new CategorizedRectangle(rs[i]);
-        }
-        
-        // divide into small and nonSmall rectangles
-        ArrayList<CategorizedRectangle> small = new ArrayList<>();
-        ArrayList<CategorizedRectangle> nonSmall = new ArrayList<>();
-        
-        Pair<ArrayList<CategorizedRectangle>,
-                 ArrayList<CategorizedRectangle>> rectangles = splitOnCategory(Category.S, crs);
-        small = rectangles.a;
-        nonSmall = rectangles.b;
-        
-        packNonSmall(nonSmall);
+            CategorizedRectangle cr = new CategorizedRectangle(rs[i]);
+            crs[i] = cr;
+            switch (cr.c){
+                case L:
+                    largeRs.add(cr);
+                    break;
+                case T:
+                    tallRs.add(cr);
+                    break;
+                case V:
+                    verticalRs.add(cr);
+                    break;
+                case H:
+                    horizontalRs.add(cr);
+                    break;
+                case S:
+                    smallRs.add(cr);
+                    break;
+                case M:
+                    mediumRs.add(cr);
+                    final int h = cr.getHeight();
+                    if (h > muH * OPT && h < deltaH * OPT){
+                        A.add(cr);
+                    } else {
+                        nonA.add(cr);
+                    }
+                    break;
+                default:
+                    throw new AssertionError(cr.c.name());
+            }
+         }
+    
+        packNonSmall();
         return new PackingSolution(p);
     }
-    
+
     // packs the nonSmall rectangles...
-    private void packNonSmall(ArrayList<CategorizedRectangle> nonSmall) {
-        ArrayList<CategorizedRectangle> medium = new ArrayList<>();
-        ArrayList<CategorizedRectangle> nonMedium = new ArrayList<>();
-        Pair<ArrayList<CategorizedRectangle>,
-                 ArrayList<CategorizedRectangle>> rectangles = splitOnCategory(Category.M, nonSmall);
-        medium = rectangles.a;
-        nonMedium = rectangles.b;
+    private void packNonSmall() {
+        packMedium();
+    }
+    
+    private void packMedium(){
+        Box mHor = packInBMhor();
+        Box mVer = packInBMver();
+    }
+    
+    // pack certain medium rectangles in a box called B_M,hor
+    private Box packInBMhor(){
+        final int stripWidth = pp.getSettings().maxHeight;
+        final int n = A.size();
+        PackingSettings ps = new PackingSettings(true, stripWidth, false, n);
+        Rectangle[] arrayA = new Rectangle[n];
+        for (int i = 0; i < n; i++){
+            arrayA[i] = A.get(i).r;
+        }
+        PackingProblem pp = new PackingProblem(ps, arrayA);
+        AlgorithmInterface nfdh = new NFDH();
+        PackingSolution sol = nfdh.solve(pp);
+        return new Box(sol.height, sol.width, arrayA);
+    }
+    
+    // pack certain medium rectangles in a box called B_M,ver
+    private Box packInBMver(){
+//         alpha * OPT not necessarily integer I think
+        final int stripWidth = (int) alpha * OPT;
+        final int n = nonA.size();
+        PackingSettings ps = new PackingSettings(true, stripWidth, false, n);
+        Rectangle[] arrayNonA = new Rectangle[n];
+        for (int i = 0; i < n; i++){
+            arrayNonA[i] = nonA.get(i).r;
+        }
+        PackingProblem pp = new PackingProblem(ps, arrayNonA);
+        AlgorithmInterface nfdh = new NFDH();
+        PackingSolution sol = nfdh.solve(pp);
+        Box mVer = new Box(sol.height, sol.width, arrayNonA);
+        mVer.rotate();
+        return mVer;
+    }
+    
+    class Box extends Rectangle {
+        Rectangle[] rectangles;
+        
+        public Box(int w, int h, Rectangle[] rs){
+            super(w, h);
+            this.rectangles = rs;
+        }
+        
     }
     
     /*
     Rectangle that has a category associated with it.
     Furthermore, height and width are reversed to match the Ingala paper.
     */
-    class CategorizedRectangle extends Rectangle {
+    class CategorizedRectangle {
         public Category c;
-        
-        public CategorizedRectangle(int w, int h) {
-            super(w, h);
-        }
+        public Rectangle r;
+        private int possiblyRoundedWidth;
+        private int possiblyRoundedHeight;
         
         public CategorizedRectangle(Rectangle r){
-            super(r);
+            this.r = r;
             determineCategory();
+            if (c.equals(Category.L) || c.equals(Category.T) || c.equals(Category.V)){
+                possiblyRoundedWidth = roundUp(r.getWidth(), (int) (gamma * OPT));
+                possiblyRoundedHeight = roundUp(r.getHeight(), (int) (gamma * OPT));
+            } else{
+                possiblyRoundedWidth = r.getWidth();
+                possiblyRoundedHeight = r.getHeight();
+            }
         }
         
-        @Override
+        private int roundUp(int numToRound, int multiple){
+            if (multiple == 0){
+                return numToRound;
+            }
+            
+            final int remainder = numToRound % multiple;
+            if (remainder == 0){
+                return numToRound;
+            }
+            
+            return numToRound + multiple - remainder;
+        }
+        
         public int getWidth(){
-            return h;
+            return possiblyRoundedHeight;
         }
         
-        @Override
+        public int getActualWidth(){
+            return r.getWidth();
+        }
+        
         public int getHeight(){
-            return w;
+            return possiblyRoundedWidth;
+        }
+        
+        public int getActualHeight(){
+            return r.getHeight();
         }
 
         private void determineCategory(){
@@ -138,48 +241,6 @@ public class IngalaSolver implements AlgorithmInterface {
             else {
                 c = Category.M;
             }
-        }
-    }
-    
-    private Pair<ArrayList<CategorizedRectangle>,
-                 ArrayList<CategorizedRectangle>>
-                                splitOnCategory(Category c, ArrayList<CategorizedRectangle> crs){
-        ArrayList<CategorizedRectangle> ofCategory = new ArrayList<>();
-        ArrayList<CategorizedRectangle> notOfCategory = new ArrayList<>();
-        for (CategorizedRectangle cr : crs){
-            if (cr.c.equals(Category.S)){
-                ofCategory.add(cr);
-            } else{
-                notOfCategory.add(cr);
-            }
-        }
-        
-        return new Pair(ofCategory, notOfCategory);
-    }
-                                
-    private Pair<ArrayList<CategorizedRectangle>,
-                 ArrayList<CategorizedRectangle>>
-                                splitOnCategory(Category c, CategorizedRectangle[] crs){
-        ArrayList<CategorizedRectangle> ofCategory = new ArrayList<>();
-        ArrayList<CategorizedRectangle> notOfCategory = new ArrayList<>();
-        for (CategorizedRectangle cr : crs){
-            if (cr.c.equals(Category.S)){
-                ofCategory.add(cr);
-            } else{
-                notOfCategory.add(cr);
-            }
-        }
-        
-        return new Pair(ofCategory, notOfCategory);
-    }                            
-    
-    class Pair<A, B> {
-        public A a;
-        public B b;
-        
-        public Pair(A a, B b){
-            this.a = a;
-            this.b = b;
         }
     }
 }
