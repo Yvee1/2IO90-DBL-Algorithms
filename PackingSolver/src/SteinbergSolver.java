@@ -1,3 +1,5 @@
+import org.w3c.dom.css.Rect;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -13,6 +15,7 @@ public class SteinbergSolver implements AlgorithmInterface {
     private int conditionm2variable_i;
     private int conditionm2variable_k;
     private int condition0variable_i;
+    private List<Rectangle> rectangles;
 
 
     @Override
@@ -25,14 +28,12 @@ public class SteinbergSolver implements AlgorithmInterface {
         int limit = settings.getMaxHeight();
 
         // Get problem
-        List<Rectangle> rectangles = Arrays.asList(p.getRectangles());
+        rectangles = Arrays.asList(p.getRectangles());
 
 
         // Set the bounding box
         Rectangle boundingBox = getInitialBoundingBox(rectangles, strip, limit);
-        System.out.println("Width: " + boundingBox.getWidth() + " Height: " + boundingBox.getHeight());
         subProblem(boundingBox, rectangles);
-
         return new PackingSolution(p);
     }
 
@@ -42,9 +43,18 @@ public class SteinbergSolver implements AlgorithmInterface {
         else if (conditionm1(boundingBox, list)) { procedurem1(boundingBox, list); }
         else if (condition3(boundingBox, list)) { procedure3(boundingBox, list); }
         else if (conditionm3(boundingBox, list)) { procedurem3(boundingBox, list); }
+        else if (condition0(boundingBox, list)) { procedure0(boundingBox, list); }
         else if (condition2(boundingBox, list)) { procedure2(boundingBox, list); }
         else if (conditionm2(boundingBox, list)) { procedurem2(boundingBox, list); }
-        else if (condition0(boundingBox, list)) { procedure0(boundingBox, list); }
+    }
+
+    private boolean solvable(Rectangle boundingBox, List<Rectangle> list) {
+        int u = boundingBox.getWidth();
+        int v = boundingBox.getHeight();
+        int a = getMaxWidth(list);
+        int b = getMaxHeight(list);
+        return getTotalArea(list) * 2 <= (u * v) - (Math.max((2 * a) - u, 0) * Math.max((2 * b) - v, 0)) && a <= u
+                && b <= v;
     }
 
     /*
@@ -136,8 +146,8 @@ public class SteinbergSolver implements AlgorithmInterface {
         }
         int u = boundingBox.getWidth();
         int v = boundingBox.getHeight();
-        int fu = u / 4;
-        int fv = v / 4;
+        float fu = u / 4;
+        float fv = v / 4;
         int area = getTotalArea(list);
         for (int i = 0; i < list.size(); i++) {
             Rectangle ri = list.get(i);
@@ -204,15 +214,15 @@ public class SteinbergSolver implements AlgorithmInterface {
      */
     private void procedure3(Rectangle boundingBox, List<Rectangle> list) {
         int Z = getTotalArea(list, condition3variable_m);
-        int up = Math.max(boundingBox.getWidth() / 2, 2 * Z / boundingBox.getHeight());
-        int upp = Math.min(boundingBox.getWidth() / 2, boundingBox.getWidth() - (2 * Z / boundingBox.getHeight()));
+        int up = Math.max(boundingBox.getWidth() / 2, Math.round((float) 2 * Z / boundingBox.getHeight()));
+        int upp = boundingBox.getWidth() - up;
         int v = boundingBox.getHeight();
         List<Rectangle> l1 = new ArrayList<>();
         List<Rectangle> l2 = new ArrayList<>(list);
         for (int i = 0; i <= condition3variable_m; i++) {
             l1.add(list.get(i));
-            l2.remove(list.get(i));
         }
+        l2.removeAll(l1);
         Rectangle Q1 = new Rectangle(up, v);
         placeRelative(boundingBox, Q1, 0, 0);
         Rectangle Q2 = new Rectangle(upp, v);
@@ -225,17 +235,16 @@ public class SteinbergSolver implements AlgorithmInterface {
         Apply procedure -3
      */
     private void procedurem3(Rectangle boundingBox, List<Rectangle> list) {
-        int listLength = list.size();
         int Z = getTotalArea(list, conditionm3variable_m);
-        int vp = Math.max(boundingBox.getHeight() / 2, 2 * Z / boundingBox.getWidth());
-        int vpp = Math.min(boundingBox.getHeight() / 2, boundingBox.getHeight() - (2 * Z / boundingBox.getWidth()));
+        int vp = Math.max(boundingBox.getHeight() / 2, Math.round((float) 2 * Z / boundingBox.getWidth()));
+        int vpp = boundingBox.getHeight() - vp;
         int u = boundingBox.getWidth();
         List<Rectangle> l1 = new ArrayList<>();
         List<Rectangle> l2 = new ArrayList<>(list);
         for (int i = 0; i <= conditionm3variable_m; i++) {
             l1.add(list.get(i));
-            l2.remove(list.get(i));
         }
+        l2.removeAll(l1);
         Rectangle Q1 = new Rectangle(u, vp);
         placeRelative(boundingBox, Q1, 0, 0);
         Rectangle Q2 = new Rectangle(u, vpp);
@@ -291,7 +300,7 @@ public class SteinbergSolver implements AlgorithmInterface {
      */
     private boolean condition1(Rectangle boundingBox, List<Rectangle> list) {
         int a = getMaxWidth(list);
-        return a >= boundingBox.getWidth() / 2;
+        return a > (float) boundingBox.getWidth() / 2;
     }
 
     /*
@@ -299,18 +308,17 @@ public class SteinbergSolver implements AlgorithmInterface {
      */
     private boolean conditionm1(Rectangle boundingBox, List<Rectangle> list) {
         int b = getMaxHeight(list);
-        return b >= boundingBox.getHeight() / 2;
+        return b > (float) boundingBox.getHeight() / 2;
     }
 
     /*
         Apply procedure 1
      */
-    private void procedure1(Rectangle boundingBox, List<Rectangle> list) {
-        List<Rectangle> l = new ArrayList<>(list);
+    private void procedure1(Rectangle boundingBox, List<Rectangle> l) {
         // Get all rectangles wider than half the width of subproblem
         l.sort(Comparator.comparing(Rectangle::getWidth).reversed());
         int m = 0;
-        while(m + 1 < list.size() && l.get(m+1).getWidth() >= boundingBox.getWidth() / 2) {
+        while(m + 1 < l.size() && l.get(m+1).getWidth() >= boundingBox.getWidth() / 2) {
             m++;
         }
         // Stack them bottom to top on the left
@@ -322,7 +330,7 @@ public class SteinbergSolver implements AlgorithmInterface {
             tempList.remove(l.get(i));
         }
         // If all rectangles placed, return
-        if (m == list.size() - 1) {
+        if (tempList.size() == 0) {
             return;
         }
         // Else sort remaining rectangles by decreasing height
@@ -344,23 +352,20 @@ public class SteinbergSolver implements AlgorithmInterface {
                 w += tempList.get(i).getWidth();
                 remainder.remove(tempList.get(i));
             }
-            if (n + 1 < tempList.size()) {
-                Rectangle Q = new Rectangle(boundingBox.getWidth() - w, boundingBox.getHeight() - h);
-                placeRelative(boundingBox, Q, 0, h);
-                subProblem(Q, remainder);
-            }
+            Rectangle Q = new Rectangle(boundingBox.getWidth() - w, boundingBox.getHeight() - h);
+            placeRelative(boundingBox, Q, 0, h);
+            subProblem(Q, remainder);
         }
     }
 
     /*
         Apply procedure -1
      */
-    private void procedurem1(Rectangle boundingBox, List<Rectangle> list) {
-        List<Rectangle> l = new ArrayList<>(list);
+    private void procedurem1(Rectangle boundingBox, List<Rectangle> l) {
         // Get all rectangles longer than half the height of subproblem
         l.sort(Comparator.comparing(Rectangle::getHeight).reversed());
         int m = 0;
-        while(m + 1 < list.size() && l.get(m+1).getHeight() >= boundingBox.getHeight() / 2) {
+        while(m + 1 < l.size() && l.get(m+1).getHeight() >= boundingBox.getHeight() / 2) {
             m++;
         }
         // Stack them left to right on the bottom
@@ -372,7 +377,7 @@ public class SteinbergSolver implements AlgorithmInterface {
             tempList.remove(l.get(i));
         }
         // If all rectangles places, return
-        if (m == list.size() - 1) {
+        if (tempList.size() == 0) {
             return;
         }
         // Else sort remaining rectangles by decreasing width
@@ -394,11 +399,9 @@ public class SteinbergSolver implements AlgorithmInterface {
                 h += tempList.get(i).getHeight();
                 remainder.remove(tempList.get(i));
             }
-            if (n + 1 < tempList.size()) {
-                Rectangle Q = new Rectangle(boundingBox.getWidth() - w, boundingBox.getHeight() - h);
-                placeRelative(boundingBox, Q, w, 0);
-                subProblem(Q, remainder);
-            }
+            Rectangle Q = new Rectangle(boundingBox.getWidth() - w, boundingBox.getHeight() - h);
+            placeRelative(boundingBox, Q, w, 0);
+            subProblem(Q, remainder);
         }
     }
 
@@ -417,13 +420,13 @@ public class SteinbergSolver implements AlgorithmInterface {
         boundingBox.setPos(0, 0);
         // If we're solving a strip problem, only one dimension has to be minimized
         if (strip) {
-            int u = limit;
-            int v = getMaxHeight(rectangles);
+            int v = limit;
+            int u = getMaxWidth(rectangles);
             int S = getTotalArea(rectangles);
             int mHeight = getMaxHeight(rectangles);
             int mWidth = getMaxWidth(rectangles);
             while(!(2 * S <= (u * v) - (Math.max(2*mWidth - u, 0) * Math.max(2*mHeight - v, 0)))) {
-                v++;
+                u++;
             }
             boundingBox.setWidth(u);
             boundingBox.setHeight(v);
