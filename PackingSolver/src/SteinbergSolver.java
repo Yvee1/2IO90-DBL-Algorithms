@@ -26,10 +26,10 @@ public class SteinbergSolver implements AlgorithmInterface {
 
         rectangles = new ArrayList<>();
         for (Rectangle r : p.getRectangles()) {
-            rectangles.add(new Rect(r));
             if (rotate && r.getHeight() > limit) {
                 r.rotate();
             }
+            rectangles.add(new Rect(r));
         }
 
         Rect boundingBox = getInitialBoundingBox(rectangles, strip, limit);
@@ -40,8 +40,8 @@ public class SteinbergSolver implements AlgorithmInterface {
             solutionRects[i] = rectangles.get(i).toRectangle();
         }
 
-        allignLeft(solutionRects, (int) Math.floor(boundingBox.getHeight()));
-        allignDown(solutionRects, (int) Math.floor(boundingBox.getWidth()));
+        allignLeft(solutionRects, (int) Math.floor(boundingBox.getHeight()) + 1);
+        allignDown(solutionRects, (int) Math.floor(boundingBox.getWidth()) + 1);
 
         PackingProblem solution = new PackingProblem(settings, solutionRects);
 
