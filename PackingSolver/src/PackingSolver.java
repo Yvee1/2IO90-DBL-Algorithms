@@ -23,7 +23,6 @@ class PackingSolver {
         OutputPrinter printer = new OutputPrinter();
 
         Rectangle[] rects = sol.problem.getRectangles();
-        System.out.println(sol.problem.getSettings().maxHeight);
         for (int i = 0; i < rects.length; i++) {
             Rectangle r1 = rects[i];
             if (r1.getHeight() + r1.getY() > sol.problem.getSettings().maxHeight) {

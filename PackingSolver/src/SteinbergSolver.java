@@ -37,13 +37,42 @@ public class SteinbergSolver implements AlgorithmInterface {
             solutionRects[i] = rectangles.get(i).toRectangle();
         }
 
+        pullLeft(solutionRects);
+
         PackingProblem solution = new PackingProblem(settings, solutionRects);
 
         return new PackingSolution(solution);
     }
 
-    private void pullLeft(List<Rect> list) {
-        
+    private void pullLeft(Rectangle[] recs) {
+        List<Rectangle> list = Arrays.asList(recs);
+        list.sort(Comparator.comparing(Rectangle::getX));
+        int step = getMinWidth(list) * 100;
+        for (int i = 0; i < list.size(); i++) {
+            Boolean col = false;
+            Rectangle r1 = list.get(i);
+            while (!col && r1.getX() > 1) {
+                for (int j = 0; j < i; j++) {
+                    if (checkCollision(list.get(j), r1, step)) {
+                        col = true;
+                        break;
+                    }
+                }
+                if (!col) {
+                    r1.setX(r1.getX() - step);
+                }
+            }
+        }
+    }
+
+    private boolean checkCollision(Rectangle left, Rectangle right, int step) {
+        if (left.getX() < right.getX() + right.getWidth() - step &&
+                left.getX() + left.getWidth() > right.getX() - step &&
+                left.getY() < right.getY() + right.getHeight() &&
+                left.getY() + left.getHeight() > right.getY()) {
+            return true;
+        }
+        return false;
     }
 
     private void subProblem(Rect boundingBox, List<Rect> list) {
@@ -439,6 +468,16 @@ public class SteinbergSolver implements AlgorithmInterface {
         for (Rect r : rectangles) {
             if (r.getHeight() > m) {
                 m = r.getHeight();
+            }
+        }
+        return m;
+    }
+
+    private int getMinWidth(List<Rectangle> rectangles) {
+        int m = 0;
+        for (Rectangle r : rectangles) {
+            if (r.getWidth() < m) {
+                m = r.getWidth();
             }
         }
         return m;
