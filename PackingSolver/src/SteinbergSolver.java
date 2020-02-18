@@ -27,6 +27,9 @@ public class SteinbergSolver implements AlgorithmInterface {
         rectangles = new ArrayList<>();
         for (Rectangle r : p.getRectangles()) {
             rectangles.add(new Rect(r));
+            if (rotate && r.getHeight() > limit) {
+                r.rotate();
+            }
         }
 
         Rect boundingBox = getInitialBoundingBox(rectangles, strip, limit);
@@ -53,14 +56,14 @@ public class SteinbergSolver implements AlgorithmInterface {
         for (int i = 0; i < markerCount; i++) {
             markers[i] = 0;
         }
-        for (int i = 0; i < recs.length; i++) {
+        for (int i = 0; i < list.size(); i++) {
             pullDown(list.get(i), markers);
         }
     }
 
     private void pullDown(Rectangle r, int[] markers) {
-        int left = r.getX() + 1;
-        int right = r.getX() + r.getWidth();
+        int left = r.getX();
+        int right = r.getX() + r.getWidth() - 1;
         int max = 0;
         for (int i = left; i <= right; i++) {
             if (markers[i] > max) { max = markers[i]; }
@@ -79,14 +82,14 @@ public class SteinbergSolver implements AlgorithmInterface {
         for (int i = 0; i < markerCount; i++) {
             markers[i] = 0;
         }
-        for (int i = 0; i < recs.length; i++) {
+        for (int i = 0; i < list.size(); i++) {
             pullLeft(list.get(i), markers);
         }
     }
 
     private void pullLeft(Rectangle r, int[] markers) {
-        int bot = r.getY() + 1;
-        int top = r.getY() + r.getHeight();
+        int bot = r.getY();
+        int top = r.getY() + r.getHeight() - 1;
         int max = 0;
         for (int i = bot; i <= top; i++) {
             if (markers[i] > max) { max = markers[i]; }
@@ -95,17 +98,6 @@ public class SteinbergSolver implements AlgorithmInterface {
         for (int i = bot; i <= top; i++) {
             markers[i] = r.getX() + r.getWidth();
         }
-    }
-
-
-    private boolean checkCollision(Rectangle left, Rectangle right, int step) {
-        if (left.getX() < right.getX() + right.getWidth() - step &&
-                left.getX() + left.getWidth() > right.getX() - step &&
-                left.getY() < right.getY() + right.getHeight() &&
-                left.getY() + left.getHeight() > right.getY()) {
-            return true;
-        }
-        return false;
     }
 
     private void subProblem(Rect boundingBox, List<Rect> list) {
