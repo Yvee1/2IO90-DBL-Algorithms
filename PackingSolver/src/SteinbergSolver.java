@@ -35,17 +35,15 @@ public class SteinbergSolver implements AlgorithmInterface {
         Rect boundingBox = getInitialBoundingBox(rectangles, strip, limit);
         subProblem(boundingBox, new ArrayList<>(rectangles));
 
-        Rectangle[] solutionRects = new Rectangle[p.getRectangles().length];
-        for (int i = 0; i < solutionRects.length; i++) {
-            solutionRects[i] = rectangles.get(i).toRectangle();
+        for (int i = 0; i < rectangles.size(); i++) {
+            rectangles.get(i).toRectangle();
         }
 
-        allignLeft(solutionRects, (int) Math.floor(boundingBox.getHeight()) + 1);
-        allignDown(solutionRects, (int) Math.floor(boundingBox.getWidth()) + 1);
 
-        PackingProblem solution = new PackingProblem(settings, solutionRects);
+        allignLeft(p.getRectangles().clone(), (int) Math.floor(boundingBox.getHeight()) + 1);
+        allignDown(p.getRectangles().clone(), (int) Math.floor(boundingBox.getWidth()) + 1);
 
-        return new PackingSolution(solution);
+        return new PackingSolution(p);
     }
 
     private void allignDown(Rectangle[] recs, int totalWidth) {
@@ -526,6 +524,7 @@ public class SteinbergSolver implements AlgorithmInterface {
         private double width;
         private double height;
         private boolean rotated;
+        private Rectangle r;
 
         public Rect(double width, double height) {
             this.width = width;
@@ -537,12 +536,13 @@ public class SteinbergSolver implements AlgorithmInterface {
             this.height = r.getHeight();
             this.x = r.getX();
             this.y = r.getY();
+            this.r = r;
         }
 
-        public Rectangle toRectangle() {
-            Rectangle r = new Rectangle((int) width, (int) height);
-            r.setPos((int) Math.floor(x), (int) Math.floor(y));
-            return r;
+        public void toRectangle() {
+            this.r.setWidth((int) width);
+            this.r.setHeight((int) height);
+            this.r.setPos((int) Math.floor(x), (int) Math.floor(y));
         }
 
         public double getX() { return x; }
