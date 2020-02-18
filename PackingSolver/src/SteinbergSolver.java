@@ -474,7 +474,7 @@ public class SteinbergSolver implements AlgorithmInterface {
     }
 
     private int getMinWidth(List<Rectangle> rectangles) {
-        int m = 0;
+        int m = Integer.MAX_VALUE;
         for (Rectangle r : rectangles) {
             if (r.getWidth() < m) {
                 m = r.getWidth();
