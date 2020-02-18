@@ -37,33 +37,66 @@ public class SteinbergSolver implements AlgorithmInterface {
             solutionRects[i] = rectangles.get(i).toRectangle();
         }
 
-        pullLeft(solutionRects);
+        allignLeft(solutionRects, (int) Math.floor(boundingBox.getHeight()));
+        allignDown(solutionRects, (int) Math.floor(boundingBox.getWidth()));
 
         PackingProblem solution = new PackingProblem(settings, solutionRects);
 
         return new PackingSolution(solution);
     }
 
-    private void pullLeft(Rectangle[] recs) {
+    private void allignDown(Rectangle[] recs, int totalWidth) {
         List<Rectangle> list = Arrays.asList(recs);
-        list.sort(Comparator.comparing(Rectangle::getX));
-        int step = getMinWidth(list) * 100;
-        for (int i = 0; i < list.size(); i++) {
-            Boolean col = false;
-            Rectangle r1 = list.get(i);
-            while (!col && r1.getX() > 1) {
-                for (int j = 0; j < i; j++) {
-                    if (checkCollision(list.get(j), r1, step)) {
-                        col = true;
-                        break;
-                    }
-                }
-                if (!col) {
-                    r1.setX(r1.getX() - step);
-                }
-            }
+        list.sort(Comparator.comparing(Rectangle::getY));
+        int markerCount = totalWidth;
+        int[] markers = new int[markerCount];
+        for (int i = 0; i < markerCount; i++) {
+            markers[i] = 0;
+        }
+        for (int i = 0; i < recs.length; i++) {
+            pullDown(list.get(i), markers);
         }
     }
+
+    private void pullDown(Rectangle r, int[] markers) {
+        int left = r.getX() + 1;
+        int right = r.getX() + r.getWidth();
+        int max = 0;
+        for (int i = left; i <= right; i++) {
+            if (markers[i] > max) { max = markers[i]; }
+        }
+        r.setY(max);
+        for (int i = left; i <= right; i++) {
+            markers[i] = r.getY() + r.getHeight();
+        }
+    }
+
+    private void allignLeft(Rectangle[] recs, int totalHeight) {
+        List<Rectangle> list = Arrays.asList(recs);
+        list.sort(Comparator.comparing(Rectangle::getX));
+        int markerCount = totalHeight;
+        int[] markers = new int[markerCount];
+        for (int i = 0; i < markerCount; i++) {
+            markers[i] = 0;
+        }
+        for (int i = 0; i < recs.length; i++) {
+            pullLeft(list.get(i), markers);
+        }
+    }
+
+    private void pullLeft(Rectangle r, int[] markers) {
+        int bot = r.getY() + 1;
+        int top = r.getY() + r.getHeight();
+        int max = 0;
+        for (int i = bot; i <= top; i++) {
+            if (markers[i] > max) { max = markers[i]; }
+        }
+        r.setX(max);
+        for (int i = bot; i <= top; i++) {
+            markers[i] = r.getX() + r.getWidth();
+        }
+    }
+
 
     private boolean checkCollision(Rectangle left, Rectangle right, int step) {
         if (left.getX() < right.getX() + right.getWidth() - step &&
@@ -478,6 +511,16 @@ public class SteinbergSolver implements AlgorithmInterface {
         for (Rectangle r : rectangles) {
             if (r.getWidth() < m) {
                 m = r.getWidth();
+            }
+        }
+        return m;
+    }
+
+    private int getMinHeight(List<Rectangle> rectangles) {
+        int m = Integer.MAX_VALUE;
+        for (Rectangle r : rectangles) {
+            if (r.getHeight() < m) {
+                m = r.getHeight();
             }
         }
         return m;

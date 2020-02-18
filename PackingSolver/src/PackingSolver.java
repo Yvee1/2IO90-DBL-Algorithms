@@ -2,7 +2,7 @@
 import java.util.*;
 
 //import Visualizer;
-class PackingSolver {
+public class PackingSolver {
     static Scanner sc;
 
     static void run() {
