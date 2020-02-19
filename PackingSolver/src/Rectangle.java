@@ -39,6 +39,8 @@ public class Rectangle {
     public int getWidth() { return this.w; }
     public void setWidth(int width) { this.w = width; }
 
+    public int getReach() { return this.y + this.h; }
+
     public int getArea() {
         return this.w * this.h;
     }

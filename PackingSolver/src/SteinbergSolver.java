@@ -39,15 +39,40 @@ public class SteinbergSolver implements AlgorithmInterface {
             rectangles.get(i).toRectangle();
         }
 
-
-        allignLeft(p.getRectangles().clone(), (int) Math.floor(boundingBox.getHeight()) + 1);
-        allignDown(p.getRectangles().clone(), (int) Math.floor(boundingBox.getWidth()) + 1);
+        for (int i = 0; i < 10; i++) {
+            allignLeft(Arrays.asList(p.getRectangles().clone()), (int) Math.ceil(boundingBox.getHeight()) + 1);
+            allignDown(Arrays.asList(p.getRectangles().clone()), (int) Math.ceil(boundingBox.getWidth()) + 1);
+        }
 
         return new PackingSolution(p);
     }
 
-    private void allignDown(Rectangle[] recs, int totalWidth) {
-        List<Rectangle> list = Arrays.asList(recs);
+    private void allignUp(List<Rectangle> list, int totalWidth, int height) {
+        list.sort(Comparator.comparing(Rectangle::getReach).reversed());
+        int markerCount = totalWidth;
+        int[] markers = new int[markerCount];
+        for (int i = 0; i < markerCount; i++) {
+            markers[i] = height;
+        }
+        for (int i = 0; i < list.size(); i++) {
+            pullUp(list.get(i), markers);
+        }
+    }
+
+    private void pullUp(Rectangle r, int[] markers) {
+        int left = r.getX();
+        int right = r.getX() + r.getWidth() - 1;
+        int min = Integer.MAX_VALUE;
+        for (int i = left; i <= right; i++) {
+            if (markers[i] < min) { min = markers[i]; }
+        }
+        r.setY(min - r.getHeight());
+        for (int i = left; i <= right; i++) {
+            markers[i] = r.getY();
+        }
+    }
+
+    private void allignDown(List<Rectangle> list, int totalWidth) {
         list.sort(Comparator.comparing(Rectangle::getY));
         int markerCount = totalWidth;
         int[] markers = new int[markerCount];
@@ -72,8 +97,7 @@ public class SteinbergSolver implements AlgorithmInterface {
         }
     }
 
-    private void allignLeft(Rectangle[] recs, int totalHeight) {
-        List<Rectangle> list = Arrays.asList(recs);
+    private void allignLeft(List<Rectangle> list, int totalHeight) {
         list.sort(Comparator.comparing(Rectangle::getX));
         int markerCount = totalHeight;
         int[] markers = new int[markerCount];
@@ -100,6 +124,12 @@ public class SteinbergSolver implements AlgorithmInterface {
 
     private void subProblem(Rect boundingBox, List<Rect> list) {
         if (list.size() == 0) { return; }
+        if (boundingBox.getWidth() % 1 >= 0.9999) {
+            boundingBox.setWidth(Math.ceil(boundingBox.getWidth()));
+        }
+        if (boundingBox.getHeight() % 1 >= 0.9999) {
+            boundingBox.setHeight(Math.ceil(boundingBox.getHeight()));
+        }
         list.sort(Comparator.comparing(Rect::getWidth).reversed());
         if (condition1(boundingBox, list)) { procedure1(boundingBox, list); return;}
         else if (condition2(boundingBox, list)) { procedure2(boundingBox, list); return;}
