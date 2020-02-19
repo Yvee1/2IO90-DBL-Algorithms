@@ -59,31 +59,47 @@ class BruteForceSolver implements AlgorithmInterface {
      */
     @Override
     public PackingSolution solve(PackingProblem p) {
+        boolean done = false;
+        
         setVariables(p);
         
         fitRectangles();
 
-        for (int i = 0; i < maxWidth; i++) {
-            if (solutionArray[i][0] != 1) {
-                finalWidth = i + 1;
+        for (int i = (maxWidth - 1); i >= 0; i--) {
+            if (done) {
                 break;
             }
+            
+            for (int j = 0; j < containerHeight; j++) {
+                if (solutionArray[i][j] == 1) {
+                    finalWidth = i + 1;
+                    done = true;
+                    break;
+                }
+            }
         }
-        
         copyInto(rectangles, rect);
         solution = new PackingSolution(p, finalWidth, containerHeight);
 
+        /**
+         * Two different loops depending on whether or not this is fixed
+         */
         for (int w = finalWidth; w >= maxRectangleWidth; w--) {
             maxWidth = w;
             while(solution.width*solution.height > w*containerHeight) {
-                if (!doRectanglesFit(w, containerHeight)) {
-                    containerHeight++;
-                } else {
+                if (doRectanglesFit(w, containerHeight)) {
                     copyInto(rectangles, rect);
                     solution = new PackingSolution(p, w, containerHeight);
+                } else {
+                    if  (settings.getFixed()) {
+                        break;
+                    } else {
+                        containerHeight++;
+                    }
                 }
             }           
         }
+
         return solution;
     }
 
@@ -98,33 +114,46 @@ class BruteForceSolver implements AlgorithmInterface {
          * Set the container appropriately
          */
         solutionArray = new int[w][h];
-        
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
                 solutionArray[x][y] = 0;
             }
         }   
         
-        return recursePlace(0);
+        
+        boolean result = recursePlace(0);
+        return result;
     }
     
     private boolean recursePlace(int i) {
         if (i == rectangles.length) {
             return true;
         }
-        
-        for (int x = 0; x < solutionArray.length; x++) {
-            for (int y = 0; y < solutionArray[0].length; y++) {
-                if (rectanglePossible(rectangles[i], x, y)) {
-                    placeRectangle(rectangles[i], x, y);
-                    if (recursePlace(i+1)) {
-                        return true;
+        if (1 ==0) {
+            for (int x = 0; x < Math.ceil(solutionArray.length/4); x++) {
+                for (int y = 0; y < Math.ceil(solutionArray[0].length/4); y++) {             
+                    if (rectanglePossible(rectangles[i], x, y)) {
+                        placeRectangle(rectangles[i], x, y);
+                        if (recursePlace(i+1)) {
+                            return true;
+                        }
+                        unplaceRectangle(rectangles[i], x, y);
                     }
-                    unplaceRectangle(rectangles[i], x, y);
                 }
-            }
-        } 
-        
+            } 
+        } else {
+            for (int x = 0; x < solutionArray.length; x++) {
+                for (int y = 0; y < solutionArray[0].length; y++) {             
+                    if (rectanglePossible(rectangles[i], x, y)) {
+                        placeRectangle(rectangles[i], x, y);
+                        if (recursePlace(i+1)) {
+                            return true;
+                        }
+                        unplaceRectangle(rectangles[i], x, y);
+                    }
+                }
+            } 
+        }
         return false;
     }
 
@@ -161,9 +190,13 @@ class BruteForceSolver implements AlgorithmInterface {
         
 
         /**
-         * solution has the max height
+         * solution has the max height, only if no fixed height
          */
-        containerHeight = rectangles[0].getHeight();
+        if (settings.getFixed()) {
+            containerHeight = settings.getMaxHeight();
+        } else {
+            containerHeight = rectangles[0].getHeight();
+        }
 
         /**
          * Set the container appropriately
