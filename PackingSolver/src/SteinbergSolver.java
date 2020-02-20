@@ -44,7 +44,7 @@ public class SteinbergSolver implements AlgorithmInterface {
         }
 
         // "shake" the boundingbox to make more compact solution
-        //shake(p);
+        shake(p);
 
         // Return the solution
         return new PackingSolution(p);
@@ -70,33 +70,45 @@ public class SteinbergSolver implements AlgorithmInterface {
                 height = r.getY() + r.getHeight();
             }
         }
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             leftDown(rects, width, height);
         }
-        for (int i = 0; i < 10; i++) {
-
+        for (int i = 0; i < 100; i++) {
+            width = 0;
+            height = 0;
+            for (Rectangle r : rects) {
+                if (r.getHorizontalReach() > width) {
+                    width = r.getHorizontalReach();
+                }
+                if (r.getVerticalReach() > height) {
+                    height = r.getVerticalReach();
+                }
+            }
+            pullUp(rects, width, height);
+            leftDown(rects, width, height);
         }
+        pullLeft(rects, height);
     }
 
-    private void pullUp(List<Rectangle> list, int width) {
-        list.sort(Comparator.comparing(Rectangle::getVerticalReach));
+    private void pullUp(List<Rectangle> list, int width, int height) {
+        list.sort(Comparator.comparing(Rectangle::getVerticalReach).reversed());
         int[] markers = new int[width];
-        for (int i = 0; i < width; i++) { markers[i] = 0; }
+        for (int i = 0; i < width; i++) { markers[i] = height; }
         for (Rectangle r : list) {
-            down(r, markers);
+            up(r, markers, height);
         }
     }
 
-    private void up(Rectangle r, int[] markers) {
+    private void up(Rectangle r, int[] markers, int height) {
         int left = r.getX();
         int right = left + r.getWidth();
-        int mark = 0;
+        int mark = height;
         for (int i = left; i < right; i++) {
-            if (markers[i] > mark) { mark = markers[i]; }
+            if (markers[i] < mark) { mark = markers[i]; }
         }
         r.setY(mark - r.getHeight());
         for (int i = left; i < right; i++) {
-            markers[i] = mark;
+            markers[i] = mark - r.getHeight();
         }
     }
 
@@ -123,7 +135,7 @@ public class SteinbergSolver implements AlgorithmInterface {
         }
         r.setY(mark);
         for (int i = left; i < right; i++) {
-            markers[i] = mark + r.getHeight();
+            markers[i] = r.getVerticalReach();
         }
     }
 
@@ -143,9 +155,13 @@ public class SteinbergSolver implements AlgorithmInterface {
         for (int i = bottom; i < top; i++) {
             if (markers[i] > mark) { mark = markers[i]; }
         }
-        r.setX(mark);
+        if (mark <= r.getX()) {
+            r.setX(mark);
+        } else {
+            int x = 0;
+        }
         for (int i = bottom; i < top; i++) {
-            markers[i] = mark + r.getWidth();
+            markers[i] = r.getHorizontalReach();
         }
     }
 
