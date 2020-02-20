@@ -1,5 +1,5 @@
 
-public class Rectangle {
+public class Rectangle implements Cloneable {
     public int w, h;
     public int x, y;
     public boolean rotated;
@@ -23,6 +23,11 @@ public class Rectangle {
         this.x = r.x;
         this.y = r.y;
         this.rotated = r.rotated;
+    }
+
+    @Override
+    public Rectangle clone() {
+        return new Rectangle(this);
     }
 
     public int getX() { return this.x; }
@@ -49,11 +54,12 @@ public class Rectangle {
     /**
      * Rotate the rectangle by swapping width and height.
      */
-    public void rotate() {
+    public Rectangle rotate() {
         this.rotated = !this.rotated;
         int tmp = w;
         this.w = this.h;
         this.h = tmp;
+        return this;
     }
 
     /**
