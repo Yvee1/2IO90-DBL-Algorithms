@@ -16,7 +16,7 @@ import javax.swing.JFrame;
  */
 public class Visualizer extends Canvas  {
     // maximum window size
-    private static int maxWindowSize = 1000;
+    private final static int maxWindowSize = 500;
     private static int windowWidth;
     private static int windowHeight;
     // scaling that is done from original rectangle to rectangle that is drawn 
@@ -41,7 +41,11 @@ public class Visualizer extends Canvas  {
     }
     
     public void paint(Graphics g) {
-        for (Rectangle r : ps.problem.rectangles){
+        for (Rectangle r : ps.problem.getRectangles()){
+            if (r.x < 0){
+                continue;
+            }
+            
             final float hue = rand.nextFloat();
             // Saturation between 0.3 and 0.5
             final float saturation = (rand.nextInt(5000) + 3000) / 10000f;
@@ -74,7 +78,7 @@ public class Visualizer extends Canvas  {
     
     public static void visualize(PackingSolution ps_){
         ps = ps_;
-        
+
         // Make proper size window
         final double aspectRatio = (double) ps.width / ps.height;
         if (aspectRatio > 1){
