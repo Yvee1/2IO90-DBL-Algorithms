@@ -87,6 +87,34 @@ public class SteinbergSolver implements AlgorithmInterface {
             pullUp(rects, width, height);
             leftDown(rects, width, height);
         }
+//        for (Rectangle r : rects) {
+//            if (r.getHorizontalReach() > width) {
+//                width = r.getHorizontalReach();
+//            }
+//            if (r.getVerticalReach() > height) {
+//                height = r.getVerticalReach();
+//            }
+//        }
+//        for (int i = 0; i < width / 4; i++) {
+//            List<Rectangle> column = new ArrayList<>();
+//            for (Rectangle r : rects) {
+//                if (r.getX() == width - i) {
+//                    column.add(r);
+//                }
+//            }
+//            column.sort(Comparator.comparing(Rectangle::getVerticalReach).reversed());
+//            for (int j = 0; j < column.size(); j++) {
+//                boolean cool = true;
+//                if (j + 1 < column.size() && column.get(j+1).getVerticalReach() != column.get(j).getY()) {
+//                    cool = false;
+//                }
+//                List<Rectangle> upList = new ArrayList<>();
+//                upList.add(column.get(j));
+//                pullUp(upList, width, height);
+//                leftDown(rects, width, height);
+//                if (!cool) { break; }
+//            }
+//        }
         pullLeft(rects, height);
     }
 
