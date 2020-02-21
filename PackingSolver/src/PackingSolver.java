@@ -7,25 +7,38 @@ public class PackingSolver {
 
     static void run() {
 
+        // Read the problem from inpit
         InputReader reader = new InputReader();
-
         PackingProblem p = reader.readProblem();
 
-
+        // Decide which algorithm to apply
         AlgorithmInterface ai;
-
         if (p.rectangles.length <= 4) {
            ai  = new SteinbergSolver();
         } else { ai = new SteinbergSolver(); }
 
+        // Run the algorithm and time the operation time
+        long startTime = System.currentTimeMillis();
         PackingSolution sol = ai.solve(p);
+        long endTime = System.currentTimeMillis();
+        long time = endTime - startTime;
 
+        // Do some more stuff based on time left
+
+        // Verify the solutios validity
+        checkValidity(sol.problem.getRectangles(), p.getSettings());
+
+        // Print the solution
         OutputPrinter printer = new OutputPrinter();
+        printer.printSolution(sol);
 
-        Rectangle[] rects = sol.problem.getRectangles();
+        //Visualizer.visualize(sol);
+    }
+
+    public static void checkValidity(Rectangle[] rects, PackingSettings settings) {
         for (int i = 0; i < rects.length; i++) {
             Rectangle r1 = rects[i];
-            if (r1.getHeight() + r1.getY() > sol.problem.getSettings().maxHeight) {
+            if (r1.getHeight() + r1.getY() > settings.maxHeight) {
                 System.out.println("MAX HEIGHT VIOLATED: " + i);
             }
             for (int j = 0; j < rects.length; j++) {
@@ -40,9 +53,6 @@ public class PackingSolver {
                 System.out.println("OVERLAP DETECTED: (" + i + "," + j + ")");
             }
         }
-
-        printer.printSolution(sol);
-        //Visualizer.visualize(sol);
     }
 
     public static void main(String args[]) {
