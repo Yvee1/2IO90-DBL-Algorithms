@@ -6,33 +6,76 @@ public class PackingSolver {
     static Scanner sc;
 
     static void run() {
+        boolean multipleSolvers = true;
 
         // Read the problem from inpit
         InputReader reader = new InputReader();
         PackingProblem p = reader.readProblem();
+        long bigBang = System.currentTimeMillis();
+        
+        // Array of solvers to use in order of non-increasing running-time
+        AlgorithmInterface[] solvers;
 
         // Decide which algorithm to apply
         AlgorithmInterface ai;
         if (p.rectangles.length <= 4) {
-           ai  = new SteinbergSolver();
-        } else { ai = new SteinbergSolver(); }
+            ai = new BruteForceSolver();
 
-        // Run the algorithm and time the operation time
-        long startTime = System.currentTimeMillis();
-        PackingSolution sol = ai.solve(p);
-        long endTime = System.currentTimeMillis();
-        long time = endTime - startTime;
+            solvers = new AlgorithmInterface[1];
+            solvers[0] = ai;
+            
+        } else { 
+            ai = new SteinbergSolver(); 
+            solvers = new AlgorithmInterface[]
+            {new SteinbergSolver(), new FFDH(), new NFDH()};
+        }
 
+        
+        PackingSolution bestSolution = null;
+        
         // Do some more stuff based on time left
+        if (multipleSolvers){
+            PackingProblem[] ps = new PackingProblem[solvers.length];
+            ps[0] = p;
+            for (int i = 1; i < solvers.length; i++){
+                ps[i] = new PackingProblem(p);
+            }
+            // seconds used for previous algorithm
+            double secondsUsed = 0;
+            // seconds left till total time reaches 30
+            double secondsLeft = 30 - (System.currentTimeMillis() - bigBang) / 1000;
+
+            
+            
+            for (int i = 0; i < solvers.length && secondsLeft > secondsUsed; i++){
+                long startTime = System.currentTimeMillis();
+                PackingSolution sol = solvers[i].solve(p);
+                long endTime = System.currentTimeMillis();
+                long time = endTime - startTime;
+                
+                secondsUsed = (double) time / 1000;
+                secondsLeft = 30 - secondsUsed;
+                
+                if (bestSolution == null || sol.area() < bestSolution.area()){
+                    bestSolution = sol;
+                }
+            }
+        } else {
+            // Run the algorithm and time the operation time
+            long startTime = System.currentTimeMillis();
+            bestSolution = ai.solve(p);
+            long endTime = System.currentTimeMillis();
+            long time = endTime - startTime;
+        }
 
         // Verify the solutios validity
-        checkValidity(sol.problem.getRectangles(), p.getSettings());
+        checkValidity(bestSolution.problem.getRectangles(), p.getSettings());
 
         // Print the solution
         OutputPrinter printer = new OutputPrinter();
-        printer.printSolution(sol);
-
-        //Visualizer.visualize(sol);
+        printer.printSolution(bestSolution);
+        
+        Visualizer.visualize(bestSolution);
     }
 
     public static void checkValidity(Rectangle[] rects, PackingSettings settings) {
