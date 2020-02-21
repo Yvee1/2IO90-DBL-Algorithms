@@ -3,6 +3,7 @@ public class Rectangle implements Cloneable {
     public int w, h;
     public int x, y;
     public boolean rotated;
+    public int id;
 
     /**
      * A rectangle with a specified width and height.
@@ -23,6 +24,7 @@ public class Rectangle implements Cloneable {
         this.x = r.x;
         this.y = r.y;
         this.rotated = r.rotated;
+        this.id = r.id;
     }
 
     @Override
