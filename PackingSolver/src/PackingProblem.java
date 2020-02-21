@@ -17,7 +17,21 @@ public class PackingProblem {
         this.settings = settings;
         this.rectangles = rectangles;
 
-        /* clone() is a shallow copy, so Rectangle pointers are idential. */
+        /* clone() is a shallow copy, so Rectangle pointers are identical. */
+        this.initialOrderRectangle = this.rectangles.clone();
+    }
+    
+    public PackingProblem(PackingProblem p){
+        Rectangle[] toCopy = p.getRectangles();
+        Rectangle[] rs = new Rectangle[toCopy.length];
+        for (int i = 0; i < toCopy.length; i++){
+            rs[i] = toCopy[i].clone();
+        }
+        
+        this.settings = p.settings;
+        this.rectangles = rs;
+        
+        /* clone() is a shallow copy, so Rectangle pointers are identical. */
         this.initialOrderRectangle = this.rectangles.clone();
     }
 
