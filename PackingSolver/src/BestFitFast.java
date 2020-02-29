@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.TreeSet;
 import java.util.PriorityQueue;
@@ -150,6 +151,18 @@ public class BestFitFast implements AlgorithmInterface {
      */
     private void mergeSegments(SkylineSegment segment) {
 
+        /* If both neighbours are at the same x-position, merge with both. */
+        if(segment.bottom.x == segment.x && segment.top.x == segment.x) {
+            segment.bottom.len += segment.len + segment.top.len;
+
+            /* Link segment two above current segment to the 'new' segment. */
+            /* segment.top.top always exists, due to the height being finite. */
+            segment.bottom.top = segment.top.top;
+            segment.top.top.bottom = segment.bottom;
+
+            return;
+        }
+
         /* Prioritize bottom neighbour due to lower runtime. */
         if (segment.bottom.x <= segment.top.x) {
             /* Merge the segment with its left neighbour. */
@@ -169,6 +182,41 @@ public class BestFitFast implements AlgorithmInterface {
         segment.bottom.top = segment.top;
         segment.top.bottom = segment.bottom;
     }
+
+//    /**
+//     * When rotations are allowed, it may be possible to remove 'towers'.
+//     */
+//    private void postProcess() {
+//
+//        /* Sort rectangles by decreasing 'top' edge height. */
+//        Arrays.sort(usedRectangles, new Comparator<Rectangle>() {
+//            @Override
+//            public int compare(Rectangle o1, Rectangle o2) {
+//                return -Integer.compare(o1.x + o1.w, o2.x + o2.w);
+//            }
+//        });
+//
+//
+//        int totalWidth = usedRectangles[0].x + usedRectangles[0].w;
+//
+//        for (int i = 0; i < usedRectangles.length; i++) {
+//
+//            Rectangle cur = usedRectangles[i];
+//
+//            /* If the rectangle will not lead to an improvement, we are done. */
+//            if (cur.w <= cur.h) { break; }
+//
+//            /* TODO: prove that this may be done. */
+//            if (cur.x + cur.w < totalWidth) { break; }
+//
+//            if (cur.x + cur.w >= totalWidth) {
+//                totalWidth = cur.x + cur.w;
+//            }
+//
+//        }
+//
+//
+//    }
 
 }
 
@@ -206,4 +254,3 @@ class RectangleWrap {
          this.orig = orig;
      }
 }
-
