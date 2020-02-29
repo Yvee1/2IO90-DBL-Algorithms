@@ -152,7 +152,7 @@ public class BestFitFast implements AlgorithmInterface {
     private void mergeSegments(SkylineSegment segment) {
 
         /* If both neighbours are at the same x-position, merge with both. */
-        if(segment.bottom.x == segment.x && segment.top.x == segment.x) {
+        if (segment.bottom.x == segment.top.x) {
             segment.bottom.len += segment.len + segment.top.len;
 
             /* Link segment two above current segment to the 'new' segment. */
@@ -164,7 +164,7 @@ public class BestFitFast implements AlgorithmInterface {
         }
 
         /* Prioritize bottom neighbour due to lower runtime. */
-        if (segment.bottom.x <= segment.top.x) {
+        if (segment.bottom.x < segment.top.x) {
             /* Merge the segment with its left neighbour. */
             segment.bottom.len += segment.len;
         } else {
