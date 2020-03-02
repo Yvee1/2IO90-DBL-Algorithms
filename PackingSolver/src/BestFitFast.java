@@ -160,6 +160,9 @@ public class BestFitFast implements AlgorithmInterface {
             segment.bottom.top = segment.top.top;
             segment.top.top.bottom = segment.bottom;
 
+            /* Remove the merged top segment. */
+            skyline.remove(segment.top);
+
             return;
         }
 
