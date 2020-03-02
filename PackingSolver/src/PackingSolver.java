@@ -44,17 +44,19 @@ public class PackingSolver {
             double secondsUsed = 0;
             // seconds left till total time reaches 30
             double secondsLeft = 30 - (System.currentTimeMillis() - bigBang) / 1000;
-
-            
             
             for (int i = 0; i < solvers.length && secondsLeft > secondsUsed; i++){
                 long startTime = System.currentTimeMillis();
-                PackingSolution sol = solvers[i].solve(p);
+                PackingSolution sol = solvers[i].solve(ps[i]);
                 long endTime = System.currentTimeMillis();
                 long time = endTime - startTime;
                 
                 secondsUsed = (double) time / 1000;
                 secondsLeft = 30 - secondsUsed;
+               
+//                System.out.println();
+//                System.out.println(solvers[i].getClass().getName());
+//                System.out.println(sol.area());
                 
                 if (bestSolution == null || sol.area() < bestSolution.area()){
                     bestSolution = sol;
@@ -74,7 +76,10 @@ public class PackingSolver {
         // Print the solution
         OutputPrinter printer = new OutputPrinter();
         printer.printSolution(bestSolution);
-        
+//        System.out.println("------");
+//        System.out.println("Best solution");
+//        System.out.println(bestSolution.area());
+
         Visualizer.visualize(bestSolution);
     }
 
