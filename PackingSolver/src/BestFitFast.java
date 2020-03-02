@@ -222,6 +222,8 @@ public class BestFitFast implements AlgorithmInterface {
 
             /* If the rectangle is higher than it is wide, rotating will increase the width.*/
             /* If the rectangle doesn't fit when rotated, we are also done. */
+            /* If the right edge is positioned to the left of the current width, then there is a previously */
+            /* rotated rectangle at the current width, hence we are done. */
             if (r.h >= r.w || r.w > p.settings.maxHeight || r.x+r.w < width) { return; }
 
             /* Save the rectangle's position if revert is needed. */
