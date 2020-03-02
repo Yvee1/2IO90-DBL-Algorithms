@@ -9,6 +9,9 @@ public class BestFitFast implements AlgorithmInterface {
     private TreeSet<RectangleWrap> bst;
     private Rectangle usedRectangles[];
 
+    /* Store the top segment of a rectangle. */
+    private SkylineSegment topSegments[];
+
     public PackingSolution solve(PackingProblem p) {
 
         /* Create a min-heap with y as key. */
@@ -29,6 +32,7 @@ public class BestFitFast implements AlgorithmInterface {
         });
 
         usedRectangles = new Rectangle[p.getRectangles().length];
+        topSegments = new SkylineSegment[p.getRectangles().length];
 
         for (Rectangle r: p.getRectangles()) {
 
@@ -64,18 +68,20 @@ public class BestFitFast implements AlgorithmInterface {
 
         while (!bst.isEmpty()) {
 
+            /* Find the left-bottom skyline segment. */
             SkylineSegment segment = skyline.poll();
 
             /* Set up search_rect to search for a rectangle of width w. */
             search_rect.orig.h = segment.len;
             RectangleWrap w = bst.floor(search_rect);
 
-            /* If there is no best-fit rectangle. */
+            /* If there is no best-fit rectangle, merge the segment with its leftmost neighbour. */
             if (w == null) {
                 mergeSegments(segment);
                 continue;
             }
 
+            /* Set the placed rectangle's position. */
             w.orig.setPos(segment.x, segment.y);
 
             updateSkyline(w.orig, segment);
@@ -85,8 +91,10 @@ public class BestFitFast implements AlgorithmInterface {
             if (p.settings.rotation) { bst.remove(w.other); }
 
             usedRectangles[index++] = w.orig;
+        }
 
-
+        if (p.settings.rotation) {
+            postProcess(p);
         }
 
         p.rectangles = usedRectangles;
@@ -140,14 +148,19 @@ public class BestFitFast implements AlgorithmInterface {
         newSeg.bottom.top = newSeg;
         newSeg.top.bottom = newSeg;
 
+        /* newSeg is the top segment of r. */
+        topSegments[r.id] = newSeg;
+
         /* Add the new segment to the skyline. */
         skyline.add(newSeg);
 
     }
 
+
     /**
      * Merge segment with its lower neighbour.
-     * @param segment
+     * @param segment The skyline segment to be merged.
+     * @pre The skyline does not contain segment.
      */
     private void mergeSegments(SkylineSegment segment) {
 
@@ -173,12 +186,13 @@ public class BestFitFast implements AlgorithmInterface {
         } else {
             segment.top.len += segment.len;
 
-            /* The right neighbour moves to the left. */
+            /* The right neighbour moves down. */
             segment.top.y = segment.y;
 
             /* Since the next segment now has a lower x-coordinate, remove and re-add from heap. */
             skyline.remove(segment.top);
             skyline.add(segment.top);
+
         }
 
         /* Remove segment from linked list. */
@@ -186,45 +200,80 @@ public class BestFitFast implements AlgorithmInterface {
         segment.top.bottom = segment.bottom;
     }
 
-//    /**
-//     * When rotations are allowed, it may be possible to remove 'towers'.
-//     */
-//    private void postProcess() {
-//
-//        /* Sort rectangles by decreasing 'top' edge height. */
-//        Arrays.sort(usedRectangles, new Comparator<Rectangle>() {
-//            @Override
-//            public int compare(Rectangle o1, Rectangle o2) {
-//                return -Integer.compare(o1.x + o1.w, o2.x + o2.w);
-//            }
-//        });
-//
-//
-//        int totalWidth = usedRectangles[0].x + usedRectangles[0].w;
-//
-//        for (int i = 0; i < usedRectangles.length; i++) {
-//
-//            Rectangle cur = usedRectangles[i];
-//
-//            /* If the rectangle will not lead to an improvement, we are done. */
-//            if (cur.w <= cur.h) { break; }
-//
-//            /* TODO: prove that this may be done. */
-//            if (cur.x + cur.w < totalWidth) { break; }
-//
-//            if (cur.x + cur.w >= totalWidth) {
-//                totalWidth = cur.x + cur.w;
-//            }
-//
-//        }
-//
-//
-//    }
+    /**
+     * When rotations are allowed, it may be possible to remove 'towers'.
+     */
+    private void postProcess(PackingProblem p) {
+
+        /* Sort rectangles by decreasing 'top' edge height. */
+        Arrays.sort(usedRectangles, new Comparator<Rectangle>() {
+            @Override
+            public int compare(Rectangle o1, Rectangle o2) {
+                return -Integer.compare(o1.x + o1.w, o2.x + o2.w);
+            }
+        });
+
+        int width = usedRectangles[0].x + usedRectangles[0].w;
+
+        /* Loop over all rectangles. */
+        for (int i = 0; i < usedRectangles.length; i++) {
+
+            Rectangle r = usedRectangles[i];
+
+            /* If the rectangle is higher than it is wide, rotating will increase the width.*/
+            /* If the rectangle doesn't fit when rotated, we are also done. */
+            if (r.h >= r.w || r.w > p.settings.maxHeight || r.x+r.w < width) { return; }
+
+            /* Save the rectangle's position if revert is needed. */
+            int x_cache = r.x;
+            int y_cache = r.y;
+
+            /* Rotate r. */
+            r.rotate();
+
+            /* Update the skyline. */
+            SkylineSegment seg = topSegments[r.id];
+            skyline.remove(seg);
+            seg.x = r.x;
+            skyline.add(seg);
+
+            /* Find the leftmost segment, and raise until r fits. */
+            SkylineSegment left = skyline.poll();
+            while (r.h > left.len) {
+                mergeSegments(left);
+                left = skyline.poll();
+            }
+
+            r.setPos(left.x, left.y);
+            updateSkyline(r, left);
+
+            /* Calculate the new width. */
+            /*
+            The new width is either the new right-edge of the refitted rectangle, or the right-edge of the next
+            in the sorted list.
+            */
+            int newWidth;
+            if (i == usedRectangles.length - 1) { newWidth = r.x + r.w; }
+            else { newWidth = Math.max(usedRectangles[i+1].x + usedRectangles[i+1].w, r.x + r.w); }
+
+            /* If no improvement was made, revert current rectangle and we are done. */
+            if (newWidth > width) {
+                r.setPos(x_cache, y_cache);
+                r.rotate();
+                return;
+            }
+
+            /* Update new width if improved. */
+            width = newWidth;
+
+        }
+
+    }
 
 }
 
 /* Represents a Skyline interval */
- class SkylineSegment {
+class SkylineSegment {
     int x;
     int len;
     int y;
@@ -240,7 +289,7 @@ public class BestFitFast implements AlgorithmInterface {
 
 class SkylineSorterXY implements Comparator<SkylineSegment> {
 
-     @Override
+    @Override
     public int compare(SkylineSegment a, SkylineSegment b) {
         int res = Integer.compare(a.x, b.x);
 
@@ -250,10 +299,10 @@ class SkylineSorterXY implements Comparator<SkylineSegment> {
 }
 
 class RectangleWrap {
-     Rectangle orig;
-     RectangleWrap other;
+    Rectangle orig;
+    RectangleWrap other;
 
-     public RectangleWrap(Rectangle orig) {
-         this.orig = orig;
-     }
+    public RectangleWrap(Rectangle orig) {
+        this.orig = orig;
+    }
 }
