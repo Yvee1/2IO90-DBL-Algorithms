@@ -25,9 +25,9 @@ public class PackingSolver {
             solvers[0] = ai;
             
         } else { 
-            ai = new SteinbergSolver(); 
+            ai = new BestFitFast(); 
             solvers = new AlgorithmInterface[]
-            {new SteinbergSolver(), new FFDH(), new NFDH()};
+            {new SteinbergSolver(), new BestFitFast(), new FFDH(), new NFDH()};
         }
 
         
@@ -71,16 +71,16 @@ public class PackingSolver {
         }
 
         // Verify the solutios validity
-        checkValidity(bestSolution.problem.getRectangles(), p.getSettings());
+//        checkValidity(bestSolution.problem.getRectangles(), p.getSettings());
 
         // Print the solution
         OutputPrinter printer = new OutputPrinter();
-        printer.printSolution(bestSolution);
+//        printer.printSolution(bestSolution);
 //        System.out.println("------");
 //        System.out.println("Best solution");
 //        System.out.println(bestSolution.area());
 
-        Visualizer.visualize(bestSolution);
+//        Visualizer.visualize(bestSolution);
     }
 
     public static void checkValidity(Rectangle[] rects, PackingSettings settings) {
