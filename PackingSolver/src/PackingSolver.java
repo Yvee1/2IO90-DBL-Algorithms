@@ -76,6 +76,12 @@ public class PackingSolver {
         // Verify the solutios validity
         checkValidity(bestSolution.problem.getRectangles(), p.getSettings());
 
+        /* Sort rectangles by id. */
+        Arrays.sort(bestSolution.problem.getRectangles(), new Comparator<Rectangle>() {
+           @Override
+           public int compare(Rectangle a, Rectangle b) { return Integer.compare(a.id, b.id); }
+        });
+
         // Print the solution
         OutputPrinter printer = new OutputPrinter();
         printer.printSolution(bestSolution);
