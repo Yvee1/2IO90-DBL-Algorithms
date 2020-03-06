@@ -143,7 +143,10 @@ public class Visualizer extends Canvas  {
                 windowWidth = d.width;
                 windowHeight = d.height;
                 
-                scaling = (double) windowWidth / ps.width;
+                double ratioH = (double) windowHeight / boxHeight;
+                double ratioW = (double) windowWidth / boxWidth;
+                
+                scaling = Math.min(ratioW, ratioH);
             }
         });
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
