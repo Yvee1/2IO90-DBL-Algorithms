@@ -12,6 +12,7 @@ public class BestFitFast implements AlgorithmInterface {
     /* Store the top segment of a rectangle. */
     private SkylineSegment topSegments[];
 
+    @Override
     public PackingSolution solve(PackingProblem p) {
 
         /* Create a min-heap with y as key. */
