@@ -26,4 +26,7 @@ public class PackingSolution {
         this.height = height;
     }
 
+    public int area(){
+        return width * height;
+    }
 }

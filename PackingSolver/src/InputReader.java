@@ -64,6 +64,7 @@ public class InputReader {
             int width = sc.nextInt();
             int height = sc.nextInt();
             r[i] = new Rectangle(width, height);
+            r[i].id = i;
 
             if (width > largestWidth) { largestWidth = width; }
             if (height > largestHeight) { largestHeight = height; }

@@ -38,7 +38,18 @@ class BruteForceSolver implements AlgorithmInterface {
      * Array containing the solution
      */
     private int[][] solutionArray;
-
+    
+    /**
+     * Array storing the bins for the wasted space computation
+     */
+    private int[] binArray;
+    
+    /**
+     * Vectors used for the computation of wasted space
+     */
+    private int[] binVector;
+    private int[] recVector;
+    
     /**
      * Max rectangle width
      */
@@ -83,7 +94,7 @@ class BruteForceSolver implements AlgorithmInterface {
 
         /**
          * Two different loops depending on whether or not this is fixed
-         */
+        */ 
         for (int w = finalWidth; w >= maxRectangleWidth; w--) {
             maxWidth = w;
             while(solution.width*solution.height > w*containerHeight) {
@@ -99,7 +110,6 @@ class BruteForceSolver implements AlgorithmInterface {
                 }
             }           
         }
-
         return solution;
     }
 
@@ -120,18 +130,83 @@ class BruteForceSolver implements AlgorithmInterface {
             }
         }   
         
-        
+        int totalArea = solutionArray.length * solutionArray[0].length;
+        binArray = new int[(int) Math.ceil(totalArea / 2.0)];
         boolean result = recursePlace(0);
+       
         return result;
     }
     
     private boolean recursePlace(int i) {
-        if (i == rectangles.length) {
+        //System.out.println(i);
+        if (i == rectangles.length) {            
             return true;
         }
-        if (1 ==0) {
-            for (int x = 0; x < Math.ceil(solutionArray.length/4); x++) {
-                for (int y = 0; y < Math.ceil(solutionArray[0].length/4); y++) {             
+        /**
+         * Create vertical bins
+         */
+        int b = 0;
+        int binSize = 0;
+        boolean bin = false;
+        for (int x = 0; x < solutionArray.length; x++) {        
+            for (int y = 0; y < solutionArray[0].length; y++) {
+                if (!bin && solutionArray[x][y] == 0) {
+                    bin = true;
+                    binSize++;                    
+                }
+                else if (bin && solutionArray[x][y] == 0) {                    
+                    binSize++;
+                }    
+                else if (bin && solutionArray[x][y] == 1) {
+                    binArray[b] = binSize;
+                    bin = false;
+                    binSize = 0;
+                    b++;
+                }
+            }
+            if (bin) {
+                binArray[b] = binSize;
+                bin = false;
+                binSize = 0;
+                b++;
+            }
+        }
+        /**
+         * Construct the bin vector
+         */
+        binVector = new int[solutionArray[0].length];
+        int binSum = 0;
+        for (int k = 0; k < binArray.length; k++) {
+            if (binArray[k] != 0) {
+                binVector[binArray[k] - 1] = binVector[binArray[k] - 1] + binArray[k];
+                binSum = binSum + binArray[k];
+            }            
+        }
+        /**
+         * Construct the element vector
+         */        
+        recVector = new int[solutionArray[0].length];
+        int recSum = 0;
+        for (int l = i; l < rectangles.length; l++) {
+            recVector[rectangles[l].getHeight() - 1] = recVector[rectangles[l].getHeight() - 1] + rectangles[l].getArea();
+            recSum = recSum + rectangles[l].getArea();
+        }
+        /**
+         * Compute a lower bound on the wasted space and investigate whether the subproblem is solvable
+         */
+        int ws = wastedSpace(binVector, recVector);
+        if (recSum + ws > binSum) {
+            //System.out.println("Pruning...");
+            return false;
+        }
+        
+        //System.out.println(Arrays.toString(binArray));
+        //System.out.println(Arrays.toString(binVector));
+        //System.out.println(Arrays.toString(recVector));
+                
+        if (i == 0) {
+            for (int x = 0; x < Math.ceil(solutionArray.length / 2.0); x++) {
+                for (int y = 0; y < Math.ceil(solutionArray[0].length / 2.0); y++) {             
                     if (rectanglePossible(rectangles[i], x, y)) {
                         placeRectangle(rectangles[i], x, y);
                         if (recursePlace(i+1)) {
@@ -307,7 +382,7 @@ class BruteForceSolver implements AlgorithmInterface {
             return false;
         }
         
-        
+        /*
         for (int i = x; i < x + w; i++) {
             for (int j = y; j < y + h; j++) {
                 if (solutionArray[i][j] == 1) {
@@ -315,6 +390,25 @@ class BruteForceSolver implements AlgorithmInterface {
                 }
             }
         }
+        */
+        
+        /**
+         * Check for collisions on the boundary
+         * Placing rectangles in decreasing order of height ensures that no already placed rectangle is completely contained in the new one
+         */
+        
+        for (int i = x; i < x + w; i++) {
+            if (solutionArray[i][y] == 1 || solutionArray[i][y + h - 1] == 1) {
+                return false;
+            }
+        }
+        
+        for (int j = y + 1; j < y + h - 1; j++) {
+            if (solutionArray[x][j] == 1 || solutionArray[x + w - 1][j] == 1) {
+                return false;
+            }
+        }
+        
        
         return true;
     }
@@ -325,9 +419,24 @@ class BruteForceSolver implements AlgorithmInterface {
      * @param r2 
      */
     private void copyInto(Rectangle[] r1, Rectangle[] r2) {
-        for (int i =0; i < r1.length; i++) {
+        for (int i = 0; i < r1.length; i++) {
             r2[i] = new Rectangle(r1[i]);
         }
+    }
+
+    private int wastedSpace(int[] binVector, int[] areaVector) {
+        int accWaste = 0;
+        int carryoverArea = 0;
+        for (int w = 0; w < binVector.length; w++) {
+            if (binVector[w] >= carryoverArea + areaVector[w]) {                
+                accWaste = accWaste + binVector[w] - ( carryoverArea + areaVector[w] );
+                carryoverArea = 0;                
+            }
+            else {
+                carryoverArea = carryoverArea + areaVector[w] - binVector[w];
+            }
+        }        
+        return accWaste;
     }
 
 }

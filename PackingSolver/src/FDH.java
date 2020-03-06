@@ -36,7 +36,11 @@ public abstract class FDH implements AlgorithmInterface {
             }
         }
 
-        return new PackingSolution(p, getLastLevel().endPos, p.settings.maxHeight);
+        if (p.settings.fixed){
+            return new PackingSolution(p, getLastLevel().endPos, p.settings.maxHeight);
+        } else {
+            return new PackingSolution(p, getLastLevel().endPos, getLastLevel().height);
+        }
     }
 
     /**
