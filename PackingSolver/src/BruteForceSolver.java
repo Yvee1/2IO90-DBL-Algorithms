@@ -42,13 +42,16 @@ class BruteForceSolver implements AlgorithmInterface {
     /**
      * Array storing the bins for the wasted space computation
      */
-    private int[] binArray;
+    private int[] verBinArray;
+    private int[] horBinArray;
     
     /**
      * Vectors used for the computation of wasted space
      */
-    private int[] binVector;
-    private int[] recVector;
+    private int[] verBinVector;
+    private int[] verRecVector;
+    private int[] horBinVector;
+    private int[] horRecVector;
     
     /**
      * Max rectangle width
@@ -131,7 +134,8 @@ class BruteForceSolver implements AlgorithmInterface {
         }   
         
         int totalArea = solutionArray.length * solutionArray[0].length;
-        binArray = new int[(int) Math.ceil(totalArea / 2.0)];
+        verBinArray = new int[(int) Math.ceil(totalArea / 2.0)];
+        horBinArray = new int[(int) Math.ceil(totalArea / 2.0)];
         boolean result = recursePlace(0);
        
         return result;
@@ -158,14 +162,14 @@ class BruteForceSolver implements AlgorithmInterface {
                     binSize++;
                 }    
                 else if (bin && solutionArray[x][y] == 1) {
-                    binArray[b] = binSize;
+                    verBinArray[b] = binSize;
                     bin = false;
                     binSize = 0;
                     b++;
                 }
             }
             if (bin) {
-                binArray[b] = binSize;
+                verBinArray[b] = binSize;
                 bin = false;
                 binSize = 0;
                 b++;
@@ -174,35 +178,86 @@ class BruteForceSolver implements AlgorithmInterface {
         /**
          * Construct the bin vector
          */
-        binVector = new int[solutionArray[0].length];
+        verBinVector = new int[solutionArray[0].length];
         int binSum = 0;
-        for (int k = 0; k < binArray.length; k++) {
-            if (binArray[k] != 0) {
-                binVector[binArray[k] - 1] = binVector[binArray[k] - 1] + binArray[k];
-                binSum = binSum + binArray[k];
+        for (int k = 0; k < verBinArray.length; k++) {
+            if (verBinArray[k] != 0) {
+                verBinVector[verBinArray[k] - 1] = verBinVector[verBinArray[k] - 1] + verBinArray[k];
+                binSum = binSum + verBinArray[k];
             }            
         }
         /**
          * Construct the element vector
          */        
-        recVector = new int[solutionArray[0].length];
+        verRecVector = new int[solutionArray[0].length];
         int recSum = 0;
         for (int l = i; l < rectangles.length; l++) {
-            recVector[rectangles[l].getHeight() - 1] = recVector[rectangles[l].getHeight() - 1] + rectangles[l].getArea();
+            verRecVector[rectangles[l].getHeight() - 1] = verRecVector[rectangles[l].getHeight() - 1] + rectangles[l].getArea();
+            recSum = recSum + rectangles[l].getArea();
+        }
+        /**
+         * Create horizontal bins
+         */
+        b = 0;
+        binSize = 0;
+        bin = false;
+        for (int y = 0; y < solutionArray[0].length; y++) {        
+            for (int x = 0; x < solutionArray.length; x++) {
+                if (!bin && solutionArray[x][y] == 0) {
+                    bin = true;
+                    binSize++;                    
+                }
+                else if (bin && solutionArray[x][y] == 0) {                    
+                    binSize++;
+                }    
+                else if (bin && solutionArray[x][y] == 1) {
+                    horBinArray[b] = binSize;
+                    bin = false;
+                    binSize = 0;
+                    b++;
+                }
+            }
+            if (bin) {
+                horBinArray[b] = binSize;
+                bin = false;
+                binSize = 0;
+                b++;
+            }
+        }
+        /**
+         * Construct the bin vector
+         */
+        horBinVector = new int[solutionArray.length];
+        binSum = 0;
+        for (int k = 0; k < horBinArray.length; k++) {
+            if (horBinArray[k] != 0) {
+                horBinVector[horBinArray[k] - 1] = horBinVector[horBinArray[k] - 1] + horBinArray[k];
+                binSum = binSum + horBinArray[k];
+            }            
+        }
+        /**
+         * Construct the element vector
+         */        
+        horRecVector = new int[solutionArray.length];
+        recSum = 0;
+        for (int l = i; l < rectangles.length; l++) {
+            horRecVector[rectangles[l].getWidth() - 1] = horRecVector[rectangles[l].getWidth() - 1] + rectangles[l].getArea();
             recSum = recSum + rectangles[l].getArea();
         }
         /**
          * Compute a lower bound on the wasted space and investigate whether the subproblem is solvable
          */
-        int ws = wastedSpace(binVector, recVector);
+        int ws1 = wastedSpace(verBinVector, verRecVector);
+        int ws2 = wastedSpace(horBinVector, horRecVector);
+        int ws = Math.max(ws1, ws2);
         if (recSum + ws > binSum) {
             //System.out.println("Pruning...");
             return false;
         }
         
-        //System.out.println(Arrays.toString(binArray));
-        //System.out.println(Arrays.toString(binVector));
-        //System.out.println(Arrays.toString(recVector));
+        //System.out.println(Arrays.toString(verBinArray));
+        //System.out.println(Arrays.toString(verBinVector));
+        //System.out.println(Arrays.toString(verRecVector));
                 
         if (i == 0) {
             for (int x = 0; x < Math.ceil(solutionArray.length / 2.0); x++) {
