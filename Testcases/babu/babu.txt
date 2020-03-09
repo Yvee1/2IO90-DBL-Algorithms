@@ -1,5 +1,5 @@
-container height: 1000
-rotations allowed: true
+container height: fixed 1000
+rotations allowed: yes
 number of rectangles: 50
 125 150
 125 100
@@ -51,3 +51,5 @@ number of rectangles: 50
 75 100
 75 100
 75 100
+
+
