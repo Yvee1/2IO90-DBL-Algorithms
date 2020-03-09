@@ -8,9 +8,11 @@ import java.util.Scanner;
 public class SolverTester {
 
     // VUL HIER IN WELKE TEST CASES
-    private String cases = "AH";
+    private String cases = "AH, N";
     // e.g. "AH" voor alle test cases onder "\AH\"
+    // of "AH, N" voor alle test cases onder "\AH\" en "\N\"
     // of "AH\\AH1.txt" voor alleen die case
+    // of "AH\\AH1.txt, AH\\AH2.txt, AH\\AH3.txt" voor al die cases
     // Momenteel zorgen sommige consecutive squares voor overflows denk ik (negatieve areas)
 
     private AlgorithmInterface algorithm;
@@ -52,7 +54,12 @@ public class SolverTester {
     }
 
     public void addTestCase(String path) throws FileNotFoundException {
-        if (path.endsWith(".txt") || path.endsWith(".in")) {
+        if (path.contains(",")) {
+            String[] sets = path.replace(" ", "").split(",");
+            for (String s : sets) {
+                addTestCase(s);
+            }
+        } else if (path.endsWith(".txt") || path.endsWith(".in")) {
             testCases.add(new TestCase(new File(testCasesPath + path), algorithm, path));
         } else {
             File dir;
