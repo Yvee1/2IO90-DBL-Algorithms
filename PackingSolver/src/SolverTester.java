@@ -8,7 +8,8 @@ import java.util.Scanner;
 public class SolverTester {
 
     // VUL HIER IN WELKE TEST CASES
-    private String cases = "AH, N";
+    private String cases = "";
+    // e.g. "" leeg voor alle test cases
     // e.g. "AH" voor alle test cases onder "\AH\"
     // of "AH, N" voor alle test cases onder "\AH\" en "\N\"
     // of "AH\\AH1.txt" voor alleen die case
@@ -37,6 +38,9 @@ public class SolverTester {
             tc.run();
             long end = System.nanoTime();
             long dur = (end - start) / 1000000;
+            if (tc.getArea() < 0) {
+                continue;
+            }
             System.out.print("(" + i + "/" + testCases.size() + ")  ");
             System.out.print("dt: " + dur + "ms  ");
             System.out.print("n: " + tc.getProblem().getSettings().getRectangleCount() + "  ");
@@ -71,7 +75,11 @@ public class SolverTester {
             }
             dir = new File(testCasesPath + p);
             for (String item : Objects.requireNonNull(dir.list())) {
-                addTestCase(p + "\\" + item);
+                if (p.length() > 0) {
+                    addTestCase(p + "\\" + item);
+                } else {
+                    addTestCase(p + item);
+                }
             }
         }
     }
@@ -92,6 +100,7 @@ public class SolverTester {
         private double density;
 
         public TestCase(File file, AlgorithmInterface ai, String path) throws FileNotFoundException {
+            System.out.println(path);
             this.path = path;
             algo = ai;
             InputReader reader = new InputReader();

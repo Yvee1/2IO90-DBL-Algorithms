@@ -1,6 +1,8 @@
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -93,21 +95,32 @@ public class InputReader {
         boolean rot = secondLine.contains("yes");
         String[] thirdLine = sc.nextLine().trim().split(" ");
         int n = Integer.parseInt(thirdLine[3]);
-        Rectangle[] rectangles = new Rectangle[n];
+        List<Rectangle> r = new ArrayList<>();
         int largestWidth = 0;
         int largestHeight = 0;
-        for (int i = 0; i < n; i++) {
-            String[] line = sc.nextLine().trim().split(" ");
-            rectangles[i] = new Rectangle(Integer.parseInt(line[0]), Integer.parseInt(line[1]));
-            rectangles[i].id = i;
-            if (Integer.parseInt(line[0]) > largestWidth) { largestWidth = Integer.parseInt(line[0]); }
-            if (Integer.parseInt(line[1]) > largestHeight) { largestHeight = Integer.parseInt(line[1]); }
+        int id = 0;
+        while (sc.hasNextLine()) {
+            String[] line = sc.nextLine().trim().split("\\s+");
+            for (int j = 0; j < line.length / 2; j++) {
+                line[j * 2] = line[j * 2].trim();
+                line[(j * 2) + 1] = line[(j * 2) + 1].trim();
+                Rectangle rect = new Rectangle(Integer.parseInt(line[j * 2]), Integer.parseInt(line[(j * 2) + 1]));
+                rect.id = id;
+                r.add(rect);
+                id++;
+                if (rect.getWidth() > largestWidth) { largestWidth = rect.getWidth(); }
+                if (rect.getHeight() > largestHeight) { largestHeight = rect.getHeight(); }
+            }
         }
         PackingSettings settings = new PackingSettings();
         settings.setFixed(fix);
         settings.setRotation(rot);
         settings.setMaxHeight(height);
         settings.setRectangleCount(n);
+        Rectangle[] rectangles = new Rectangle[r.size()];
+        for (Rectangle rect : r) {
+            rectangles[rect.id] = rect;
+        }
         PackingProblem p = new PackingProblem(settings, rectangles);
         p.largestHeight = largestHeight;
         p.largestWidth = largestWidth;
