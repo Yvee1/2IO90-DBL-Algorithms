@@ -16,6 +16,16 @@ public class Rectangle implements Cloneable {
         this.x = this.y = -1;
         this.rotated = false;
     }
+    
+    public Rectangle(int x, int y, int w, int h) {
+        this.w = w;
+        this.h = h;
+
+        this.x = x;
+        this.y = y;
+        
+        this.rotated = false;
+    }
 
     public Rectangle(Rectangle r) {
         this.w = r.w;
@@ -45,6 +55,8 @@ public class Rectangle implements Cloneable {
 
     public int getWidth() { return this.w; }
     public void setWidth(int width) { this.w = width; }
+    
+    public int getMaxSide() { return Math.max(this.w, this.h); }
 
     public int getVerticalReach() { return this.y + this.h; }
     public int getHorizontalReach() { return this.x + this.w; }
@@ -87,6 +99,11 @@ public class Rectangle implements Cloneable {
         } else {
             return String.format("%d %d", this.x, this.y);
         }
+    }
+    
+    @Override
+    public String toString(){
+        return String.format("{pos: (%d, %d), size: (%d, %d)", x, y, w, h);
     }
 
 }
