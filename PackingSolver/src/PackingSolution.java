@@ -29,4 +29,13 @@ public class PackingSolution {
     public int area(){
         return width * height;
     }
+    
+    public double density(){
+        int usedArea = 0;
+        for (Rectangle r : problem.getRectangles()){
+            usedArea += r.getArea();
+        }
+        
+        return (double) usedArea / area();
+    }
 }
