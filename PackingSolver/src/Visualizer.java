@@ -7,12 +7,16 @@ import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Random;
 import java.util.Scanner;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 
@@ -20,7 +24,7 @@ import javax.swing.WindowConstants;
  *
  * @author 20182300
  */
-public class Visualizer extends Canvas  {
+public class Visualizer extends JPanel  {
     private final Color[] palette = new Color[] {Color.decode("#db4549"), Color.decode("#d1e1e1"), Color.decode("#3e6a90"), Color.decode("#2e3853"), Color.decode("#a3c9d3")};
     // maximum window size
     private final static int maxWindowSize = 500;
@@ -34,6 +38,27 @@ public class Visualizer extends Canvas  {
     static PackingSolution ps;
     // random number generator
     private Random rand = new Random();
+    
+    private static Rectangle[] rs;
+    private boolean debug = false;
+    private int count = 0;
+    
+    public Visualizer(){
+        if (!debug){
+            count = Integer.MAX_VALUE;
+        }
+        
+        setPreferredSize(new Dimension(windowWidth, windowHeight));
+        addMouseListener(new MouseAdapter(){
+                    @Override
+                    public void mouseClicked(MouseEvent e){
+                        if (debug){
+                            count++;
+                        }
+                        repaint();
+                    }
+        });
+    }
     
     public static void main(String[] args) throws FileNotFoundException{
         SolutionReader sr;
@@ -49,7 +74,8 @@ public class Visualizer extends Canvas  {
         visualize(sr.readSolution());
     }
     
-    public void paint(Graphics g) {    
+    @Override
+    public void paintComponent(Graphics g) {    
         Graphics2D g2 = (Graphics2D) g;
         AffineTransform oldAT = g2.getTransform();
         try {
@@ -74,7 +100,10 @@ public class Visualizer extends Canvas  {
             g2d.dispose();
             
             
-            for (Rectangle r : ps.problem.getRectangles()){
+//            for (Rectangle r : ps.problem.getRectangles()){
+            
+            for (int i = 0; i <= count && i < rs.length; i++){
+                Rectangle r = rs[i];
                 if (r.x < 0){
                     continue;
                 }
@@ -111,6 +140,7 @@ public class Visualizer extends Canvas  {
     
     public static void visualize(PackingSolution ps_){
         ps = ps_;
+        rs = ps.problem.getRectangles();
 
         boxWidth = ps.width;
         if (ps.problem.settings.fixed){
@@ -132,24 +162,27 @@ public class Visualizer extends Canvas  {
         scaling = (double) windowWidth / ps.width;
         
         // preparing the window
-        JFrame frame = new JFrame("Rectangle Packing Solution");
-        Canvas canvas = new Visualizer();
-        canvas.setSize(windowWidth, windowHeight);
-        frame.add(canvas);
-        frame.pack();
-        frame.addComponentListener(new ComponentAdapter() {
-            public void componentResized(ComponentEvent componentEvent) {
-                Dimension d = frame.getContentPane().getSize();
-                windowWidth = d.width;
-                windowHeight = d.height;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                JFrame frame = new JFrame(String.format("area: %d, density: %.2f", ps.area(), ps.density() * 100));
                 
-                double ratioH = (double) windowHeight / boxHeight;
-                double ratioW = (double) windowWidth / boxWidth;
-                
-                scaling = Math.min(ratioW, ratioH);
+                frame.add(new Visualizer());
+                frame.pack();
+                frame.addComponentListener(new ComponentAdapter() {
+                    public void componentResized(ComponentEvent componentEvent) {
+                        Dimension d = frame.getContentPane().getSize();
+                        windowWidth = d.width;
+                        windowHeight = d.height;
+
+                        double ratioH = (double) windowHeight / boxHeight;
+                        double ratioW = (double) windowWidth / boxWidth;
+
+                        scaling = Math.min(ratioW, ratioH);
+                    }
+                });
+                frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+                frame.setVisible(true);
             }
         });
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setVisible(true);
     }
 }
