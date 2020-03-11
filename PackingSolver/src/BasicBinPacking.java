@@ -33,20 +33,21 @@ public class BasicBinPacking implements AlgorithmInterface {
         emptySpaces.add(container);
         
         for (Rectangle r : rs){
-            System.out.println("-------------");
-                System.out.print("Rectangle: ");
-                System.out.println(r);
-            for (Rectangle space : emptySpaces){
-                System.out.println(space);
-            }
-            System.out.println();
-            
+//            System.out.println("-------------");
+//                System.out.print("Rectangle: ");
+//                System.out.println(r);
+//            for (Rectangle space : emptySpaces){
+//                System.out.println(space);
+//            }
+//            System.out.println();
+//            
             boolean fit = false;
             // iterate backwards
             for (int i = emptySpaces.size() - 1; i >= 0; i--){
                 if (fitsInto(r, emptySpaces.get(i))){
                     fit = true;
                     packAndSplit(r, i);
+                    break;
                 }
             }
 
@@ -58,39 +59,20 @@ public class BasicBinPacking implements AlgorithmInterface {
                 boolean canGrowUp = rw <= cw;
                 boolean canGrowRight = rh <= ch;
                 
-                boolean growUp = canGrowUp;
+                boolean shouldGrowUp = canGrowUp && 
+                        (cw >= (ch + rh));
+                boolean shouldGrowRight = canGrowRight && 
+                        (ch >= (cw + rw));
                 
-//                boolean shouldGrowUp = canGrowUp && 
-//                        (cw >= (ch + rh));
-//                boolean shouldGrowRight = canGrowRight && 
-//                        (ch >= (cw + rw));
-                
-                if (canGrowRight && canGrowUp){
-                    int areaUp = (ch + rh) * cw;
-                    int areaRight = (cw + rw) * ch;
-                    
-                    if (!rotationsAllowed){
-                        growUp = areaUp < areaRight;
-                    } else {
-                        int areaUpR = (ch + rw) * cw;
-                        int areaRightR = (cw + rh) * ch;
-                        int minimal = Math.min(areaUp, Math.min(areaRight, Math.min(areaUpR, areaRightR)));
-                        
-                        if (areaUp == minimal){
-                            growUp = true;
-                        } else if (areaUpR == minimal){
-                            r.rotate();
-                            growUp = true;
-                        } else if (areaRight == minimal){
-                            growUp = false;
-                        } else {
-                            r.rotate();
-                            growUp = false;
-                        }
-                    }
-                    
-                } 
-                if (growUp){
+                if (shouldGrowUp){
+                    emptySpaces.add(new Rectangle(container.getX()
+                            , container.getVerticalReach(), cw, rh));
+                    container.h += rh;
+                } else if (shouldGrowRight){
+                    emptySpaces.add(new Rectangle(container.getHorizontalReach()
+                            , container.getY(), rw, ch));
+                    container.w += rw;
+                } else if (canGrowUp){
                     emptySpaces.add(new Rectangle(container.getX()
                             , container.getVerticalReach(), cw, rh));
                     container.h += rh;
@@ -100,9 +82,9 @@ public class BasicBinPacking implements AlgorithmInterface {
                     container.w += rw;
                 }
                 
-                System.out.format("cu: %b, cr: %b\n", canGrowUp, canGrowRight);
-                System.out.println("New space");
-                System.out.println(emptySpaces.get(emptySpaces.size()-1));
+//                System.out.format("cu: %b, cr: %b\n", canGrowUp, canGrowRight, shouldGrowUp, shouldGrowRight);
+//                System.out.println("New space");
+//                System.out.println(emptySpaces.get(emptySpaces.size()-1));
                 packAndSplit(r, emptySpaces.size()-1);
             }
         }
@@ -133,6 +115,9 @@ public class BasicBinPacking implements AlgorithmInterface {
     private void packAndSplit(Rectangle r, int i){
         Rectangle space = emptySpaces.get(i);
         
+//        System.out.print("Space: ");
+//        System.out.println(space);
+        
         // pack r
         r.setPos(space.getX(), space.getY());
         
@@ -148,7 +133,7 @@ public class BasicBinPacking implements AlgorithmInterface {
         int verticalSpaceRemaining = space.getHeight() - r.getHeight();
         if (verticalSpaceRemaining > 0){
             verticalSpace = new Rectangle(r.getX(), r.getVerticalReach(),
-                    r.getWidth(), verticalSpaceRemaining);
+                    space.getWidth(), verticalSpaceRemaining);
         }
         
         emptySpaces.remove(i);
@@ -156,15 +141,24 @@ public class BasicBinPacking implements AlgorithmInterface {
         // Smallest 'size' at the end of arraylist
         if (horizontalSpace != null && verticalSpace != null){
             if (horizontalSpace.getMaxSide() > verticalSpace.getMaxSide()){
-                emptySpaces.add(horizontalSpace);
+//                System.out.print("Vertical space: ");
+//                System.out.println(verticalSpace);
                 emptySpaces.add(verticalSpace);
+//                System.out.print("Horizontal space: ");
+//                System.out.println(horizontalSpace);
+                emptySpaces.add(horizontalSpace);
+                
             } else {
                 emptySpaces.add(verticalSpace);
                 emptySpaces.add(horizontalSpace);
             }
         } else if (horizontalSpace != null) {
+//            System.out.print("Horizontal space: ");
+//            System.out.println(horizontalSpace);
             emptySpaces.add(horizontalSpace);
         } else if (verticalSpace != null){
+//            System.out.print("Vertical space: ");
+//            System.out.println(verticalSpace);
             emptySpaces.add(verticalSpace);
         }
     }
