@@ -21,16 +21,20 @@ public class PackingSolver {
 
         // Decide which algorithm to apply
         AlgorithmInterface ai;
-        if (p.rectangles.length <= 4) {
+        if (p.rectangles.length <= 4 && p.largestWidth <= 20 && p.largestHeight <= 20) {
             ai = new BruteForceSolver();
 
             solvers = new AlgorithmInterface[1];
             solvers[0] = ai;
-            
         } else { 
-            ai = new SteinbergSolver(); 
-            solvers = new AlgorithmInterface[]
-            {new SteinbergSolver(), new FFDH(), new NFDH()};
+            ai = new BasicBinPacking(); 
+            if (p.getSettings().fixed){
+                solvers = new AlgorithmInterface[]
+                {new BestFitFast(), new SteinbergSolver()};
+            } else {
+                solvers = new AlgorithmInterface[]
+                {new BasicBinPacking(), new BestFitFast(), new SteinbergSolver()};
+            }
         }
 
         
@@ -38,19 +42,22 @@ public class PackingSolver {
         
         // Do some more stuff based on time left
         if (multipleSolvers){
-            PackingProblem[] ps = new PackingProblem[solvers.length];
-            ps[0] = p;
-            for (int i = 1; i < solvers.length; i++){
-                ps[i] = new PackingProblem(p);
-            }
+            PackingProblem altP = new PackingProblem(p);
+            
             // seconds used for previous algorithm
             double secondsUsed = 0;
             // seconds left till total time reaches 30
             double secondsLeft = 30 - (System.currentTimeMillis() - bigBang) / 1000;
             
+            boolean useAlt = true;
             for (int i = 0; i < solvers.length && secondsLeft > secondsUsed; i++){
                 long startTime = System.currentTimeMillis();
-                PackingSolution sol = solvers[i].solve(ps[i]);
+                PackingSolution sol;
+                if (useAlt){
+                    sol = solvers[i].solve(altP);
+                } else {
+                    sol = solvers[i].solve(p);
+                }
                 long endTime = System.currentTimeMillis();
                 long time = endTime - startTime;
                 
@@ -63,6 +70,7 @@ public class PackingSolver {
                 
                 if (bestSolution == null || sol.area() < bestSolution.area()){
                     bestSolution = sol;
+                    useAlt = !useAlt;
                 }
             }
         } else {
