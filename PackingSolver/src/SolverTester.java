@@ -7,8 +7,9 @@ import java.util.Scanner;
 
 public class SolverTester {
 
+    // STOP JE SOLVER IN MAIN()
     // VUL HIER IN WELKE TEST CASES
-    private String cases = "";
+    private String cases = "ConsecutiveSquares";
     // e.g. "" leeg voor alle test cases
     // e.g. "AH" voor alle test cases onder "\AH\"
     // of "AH, N" voor alle test cases onder "\AH\" en "\N\"
@@ -33,15 +34,14 @@ public class SolverTester {
         addTestCase(cases);
         double avgDens = 0;
         int i = 1;
+        int j = 0;
         for (TestCase tc : testCases) {
+            System.out.print("(" + tc.getPath() + ") ");
+            System.out.print("(" + i + "/" + testCases.size() + ")  ");
             long start = System.nanoTime();
             tc.run();
             long end = System.nanoTime();
             long dur = (end - start) / 1000000;
-            if (tc.getArea() < 0) {
-                continue;
-            }
-            System.out.print("(" + i + "/" + testCases.size() + ")  ");
             System.out.print("dt: " + dur + "ms  ");
             System.out.print("n: " + tc.getProblem().getSettings().getRectangleCount() + "  ");
             System.out.print("rot: " + tc.getProblem().getSettings().getRotation() + "  ");
@@ -49,11 +49,16 @@ public class SolverTester {
             System.out.print("area: " + tc.getArea() + "  ");
             System.out.print("used: " + tc.getUsedSpace() + "  ");
             System.out.print("dens: " + tc.getDensity());
-            System.out.println("     (" + tc.getPath() + ")");
+            if (tc.getArea() < 0 || tc.getUsedSpace() < 0) {
+                System.out.println("  (Weird results, ignored in total stats)  ");
+                j++; i++;
+                continue;
+            }
+            System.out.println("");
             avgDens += tc.getDensity();
             i++;
         }
-        avgDens /= testCases.size();
+        avgDens /= (i - j);
         System.out.println("Average Density: " + avgDens);
     }
 
@@ -100,7 +105,6 @@ public class SolverTester {
         private double density;
 
         public TestCase(File file, AlgorithmInterface ai, String path) throws FileNotFoundException {
-            System.out.println(path);
             this.path = path;
             algo = ai;
             InputReader reader = new InputReader();

@@ -77,6 +77,16 @@ public class SteinbergSolver implements AlgorithmInterface {
         }
         // Move all rectangles left and then down, repeatedly
         for (int i = 0; i < 100; i++) {
+            width = 0;
+            height = 0;
+            for (Rectangle r : rects) {
+                if (r.getX() + r.getWidth() > width) {
+                    width = r.getX() + r.getWidth();
+                }
+                if (r.getY() + r.getHeight() > height) {
+                    height = r.getY() + r.getHeight();
+                }
+            }
             leftDown(rects, width, height);
         }
         // Move all rectangles up, left and then down, repeatedly
