@@ -113,6 +113,7 @@ class BruteForceSolver implements AlgorithmInterface {
                 }
             }           
         }
+        System.out.println(solution.area());
         return solution;
     }
 
@@ -133,9 +134,6 @@ class BruteForceSolver implements AlgorithmInterface {
             }
         }   
         
-        int totalArea = solutionArray.length * solutionArray[0].length;
-        verBinArray = new int[(int) Math.ceil(totalArea / 2.0)];
-        horBinArray = new int[(int) Math.ceil(totalArea / 2.0)];
         boolean result = recursePlace(0);
        
         return result;
@@ -146,27 +144,35 @@ class BruteForceSolver implements AlgorithmInterface {
         if (i == rectangles.length) {            
             return true;
         }
+        int totalArea = solutionArray.length * solutionArray[0].length;
+        verBinArray = new int[(int) Math.ceil(totalArea / 2.0)];
+        horBinArray = new int[(int) Math.ceil(totalArea / 2.0)];
         /**
          * Create vertical bins
          */
         int b = 0;
         int binSize = 0;
         boolean bin = false;
+        //System.out.println(solutionArray[0][0]);
         for (int x = 0; x < solutionArray.length; x++) {        
             for (int y = 0; y < solutionArray[0].length; y++) {
                 if (!bin && solutionArray[x][y] == 0) {
                     bin = true;
-                    binSize++;                    
+                    binSize++;
+                    //System.out.println("A");                    
                 }
                 else if (bin && solutionArray[x][y] == 0) {                    
                     binSize++;
+                    //System.out.println("B");
                 }    
                 else if (bin && solutionArray[x][y] == 1) {
                     verBinArray[b] = binSize;
                     bin = false;
                     binSize = 0;
                     b++;
+                    //System.out.println("C");
                 }
+                //else {System.out.println("D");}
             }
             if (bin) {
                 verBinArray[b] = binSize;
@@ -175,6 +181,7 @@ class BruteForceSolver implements AlgorithmInterface {
                 b++;
             }
         }
+        //System.out.println(Arrays.toString(verBinArray));
         /**
          * Construct the bin vector
          */
@@ -195,6 +202,8 @@ class BruteForceSolver implements AlgorithmInterface {
             verRecVector[rectangles[l].getHeight() - 1] = verRecVector[rectangles[l].getHeight() - 1] + rectangles[l].getArea();
             recSum = recSum + rectangles[l].getArea();
         }
+        //System.out.println(recSum);
+        //System.out.println(binSum);
         /**
          * Create horizontal bins
          */
@@ -244,6 +253,8 @@ class BruteForceSolver implements AlgorithmInterface {
             horRecVector[rectangles[l].getWidth() - 1] = horRecVector[rectangles[l].getWidth() - 1] + rectangles[l].getArea();
             recSum = recSum + rectangles[l].getArea();
         }
+        //System.out.println(recSum);
+        //System.out.println(binSum);
         /**
          * Compute a lower bound on the wasted space and investigate whether the subproblem is solvable
          */
@@ -483,11 +494,14 @@ class BruteForceSolver implements AlgorithmInterface {
         int accWaste = 0;
         int carryoverArea = 0;
         for (int w = 0; w < binVector.length; w++) {
-            if (binVector[w] >= carryoverArea + areaVector[w]) {                
+            if (binVector[w] > carryoverArea + areaVector[w]) {                
                 accWaste = accWaste + binVector[w] - ( carryoverArea + areaVector[w] );
                 carryoverArea = 0;                
             }
-            else {
+            else if (binVector[w] == carryoverArea + areaVector[w]) {
+                carryoverArea = 0;
+            }
+            else if (binVector[w] < carryoverArea + areaVector[w]){
                 carryoverArea = carryoverArea + areaVector[w] - binVector[w];
             }
         }        
