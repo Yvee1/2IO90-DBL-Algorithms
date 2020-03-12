@@ -7,6 +7,8 @@ public class SolverTester {
     // STOP JE SOLVER IN MAIN()
     // VUL HIER IN WELKE TEST CASES
     private String cases = "";
+    // Open visualizer als overlap of height limit exceeded is?
+    private boolean visualizeOnInvalidSolution = true;
     // e.g. "" leeg voor alle test cases
     // e.g. "AH" voor alle test cases onder "\AH\"
     // of "AH, N" voor alle test cases onder "\AH\" en "\N\"
@@ -46,7 +48,17 @@ public class SolverTester {
             System.out.print("area: " + tc.getArea() + "  ");
             System.out.print("used: " + tc.getUsedSpace() + "  ");
             System.out.print("dens: " + tc.getDensity());
-            checkValidity(Arrays.asList(tc.getSolution().problem.getRectangles()), tc.getSolution().problem.getSettings());
+            if (visualizeOnInvalidSolution) {
+                try {
+                    checkValidity(Arrays.asList(tc.getSolution().problem.getRectangles()), tc.getSolution().problem.getSettings());
+                } catch (Exception e) {
+                    System.out.println(e);
+                    Visualizer.visualize(tc.getSolution());
+                    break;
+                }
+            } else {
+                checkValidity(Arrays.asList(tc.getSolution().problem.getRectangles()), tc.getSolution().problem.getSettings());
+            }
             if (tc.getArea() < 0 || tc.getUsedSpace() < 0) {
                 System.out.println("  (Weird results, ignored in total stats)  ");
                 j++; i++;
