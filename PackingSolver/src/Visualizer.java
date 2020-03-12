@@ -180,7 +180,7 @@ public class Visualizer extends JPanel  {
                         scaling = Math.min(ratioW, ratioH);
                     }
                 });
-                frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+                frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                 frame.setVisible(true);
             }
         });

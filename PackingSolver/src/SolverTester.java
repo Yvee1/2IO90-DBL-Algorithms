@@ -6,7 +6,7 @@ public class SolverTester {
 
     // STOP JE SOLVER IN MAIN()
     // VUL HIER IN WELKE TEST CASES
-    private String cases = "T";
+    private String cases = "ConsecutiveSquares";
     // Open visualizer als overlap of height limit exceeded is?
     private boolean visualizeOnInvalidSolution = true;
     // e.g. "" leeg voor alle test cases
@@ -77,11 +77,11 @@ public class SolverTester {
         Scanner sc = new Scanner(System.in);
         System.out.println("Visualize the following case (enter to skip or e.g.'35'):");
         String input = sc.next().trim();
-        if (input.length() == 0) {
-            return;
-        } else {
+        while (input.length() != 0) {
             System.out.println("Visualising " + testCases.get(Integer.parseInt(input)).getPath());
             Visualizer.visualize(testCases.get(Integer.parseInt(input)).getSolution());
+            System.out.println("Visualize the following case (enter to skip or e.g.'35'):");
+            input = sc.next().trim();
         }
     }
 
