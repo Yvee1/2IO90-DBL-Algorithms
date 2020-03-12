@@ -1,9 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 public class SolverTester {
 
@@ -30,7 +27,7 @@ public class SolverTester {
         testCases = new ArrayList<>();
     }
 
-    public void run() throws FileNotFoundException {
+    public void run() throws Exception {
         addTestCase(cases);
         double avgDens = 0;
         int i = 1;
@@ -49,6 +46,7 @@ public class SolverTester {
             System.out.print("area: " + tc.getArea() + "  ");
             System.out.print("used: " + tc.getUsedSpace() + "  ");
             System.out.print("dens: " + tc.getDensity());
+            checkValidity(Arrays.asList(tc.getSolution().problem.getRectangles()), tc.getSolution().problem.getSettings());
             if (tc.getArea() < 0 || tc.getUsedSpace() < 0) {
                 System.out.println("  (Weird results, ignored in total stats)  ");
                 j++; i++;
@@ -89,7 +87,33 @@ public class SolverTester {
         }
     }
 
-    public static void main(String args[]) throws FileNotFoundException {
+    public void checkValidity(List<Rectangle> rects, PackingSettings settings) throws Exception {
+        for (int i = 0; i < rects.size(); i++) {
+            Rectangle r1 = rects.get(i);
+            // Check if height limit is satisfied
+            if (r1.getHeight() + r1.getY() > settings.maxHeight) {
+                throw new Exception("MAX HEIGHT VIOLATED: Rectangle " + i + " at (" + r1.getX() + "," + r1.getY() + ") " +
+                        "with dimensions (" + r1.getWidth() + "," + r1.getHeight() + "), lim=" + settings.maxHeight);
+            }
+            // For every pair of rectangles
+            for (int j = 0; j < rects.size(); j++) {
+                Rectangle r2 = rects.get(j);
+                if (r1 == r2) { continue; }
+                // Check if they overlap
+                if (r1.getX() >= r2.getX() + r2.getWidth() || r2.getX() >= r1.getX() + r1.getWidth()) {
+                    continue;
+                }
+                if (r1.getY() + r1.getHeight() <= r2.getY() || r2.getY() + r2.getHeight() <= r1.getY()) {
+                    continue;
+                }
+                throw new Exception("OVERLAP DETECTED: Rectangles " + i + ", " + j + "." + "i = (" + r1.getX() + ","
+                + r1.getY() + ")(" + r1.getWidth() + "," + r1.getHeight() + "), j = ("  + r1.getX() + ","
+                        + r2.getY() + ")(" + r2.getWidth() + "," + r2.getHeight() + ")");
+            }
+        }
+    }
+
+    public static void main(String args[]) throws Exception {
         SolverTester st = new SolverTester(new SteinbergSolver());
         st.run();
     }
