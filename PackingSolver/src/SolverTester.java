@@ -6,7 +6,7 @@ public class SolverTester {
 
     // STOP JE SOLVER IN MAIN()
     // VUL HIER IN WELKE TEST CASES
-    private String cases = "";
+    private String cases = "T";
     // Open visualizer als overlap of height limit exceeded is?
     private boolean visualizeOnInvalidSolution = true;
     // e.g. "" leeg voor alle test cases
@@ -70,6 +70,19 @@ public class SolverTester {
         }
         avgDens /= (i - j);
         System.out.println("Average Density: " + avgDens);
+        stop();
+    }
+
+    public void stop() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Visualize the following case (enter to skip or e.g.'35'):");
+        String input = sc.next().trim();
+        if (input.length() == 0) {
+            return;
+        } else {
+            System.out.println("Visualising " + testCases.get(Integer.parseInt(input)).getPath());
+            Visualizer.visualize(testCases.get(Integer.parseInt(input)).getSolution());
+        }
     }
 
     public void addTestCase(String path) throws FileNotFoundException {
