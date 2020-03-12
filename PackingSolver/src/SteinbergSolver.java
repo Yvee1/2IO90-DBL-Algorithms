@@ -19,11 +19,14 @@ public class SteinbergSolver implements AlgorithmInterface {
     // The rectangles in the problem
     List<Rect> rectangles;
 
+    // The settings
+    PackingSettings settings;
+
     @Override
     public PackingSolution solve(PackingProblem p) {
 
         // Extract problem settings
-        PackingSettings settings = p.getSettings();
+        settings = p.getSettings();
         boolean strip = settings.getFixed();
         boolean rotate = settings.getRotation();
         int limit = settings.getMaxHeight();
@@ -395,7 +398,7 @@ public class SteinbergSolver implements AlgorithmInterface {
             }
             if (list3.size() == 0) { return; }
             Rect bb = new Rect(boundingBox.getWidth() - w, boundingBox.getHeight() - h);
-            bb.setPos(w, 0);
+            place(boundingBox, bb, w, 0);
             subProblem(bb, list3);
         }
     }
@@ -494,7 +497,7 @@ public class SteinbergSolver implements AlgorithmInterface {
             }
             if (list3.size() == 0) { return; }
             Rect bb = new Rect(boundingBox.getWidth() - w, boundingBox.getHeight() - h);
-            bb.setPos(0, h);
+            place(boundingBox, bb, 0, h);
             subProblem(bb, list3);
         }
     }
