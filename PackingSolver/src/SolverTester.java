@@ -9,7 +9,7 @@ public class SolverTester {
 
     // STOP JE SOLVER IN MAIN()
     // VUL HIER IN WELKE TEST CASES
-    private String cases = "ConsecutiveSquares";
+    private String cases = "";
     // e.g. "" leeg voor alle test cases
     // e.g. "AH" voor alle test cases onder "\AH\"
     // of "AH, N" voor alle test cases onder "\AH\" en "\N\"
