@@ -92,6 +92,7 @@ public class SolverTester {
             Rectangle r1 = rects.get(i);
             // Check if height limit is satisfied
             if (r1.getHeight() + r1.getY() > settings.maxHeight) {
+                System.out.println();
                 throw new Exception("MAX HEIGHT VIOLATED: Rectangle " + i + " at (" + r1.getX() + "," + r1.getY() + ") " +
                         "with dimensions (" + r1.getWidth() + "," + r1.getHeight() + "), lim=" + settings.maxHeight);
             }
@@ -106,6 +107,7 @@ public class SolverTester {
                 if (r1.getY() + r1.getHeight() <= r2.getY() || r2.getY() + r2.getHeight() <= r1.getY()) {
                     continue;
                 }
+                System.out.println();
                 throw new Exception("OVERLAP DETECTED: Rectangles " + i + ", " + j + "." + "i = (" + r1.getX() + ","
                 + r1.getY() + ")(" + r1.getWidth() + "," + r1.getHeight() + "), j = ("  + r1.getX() + ","
                         + r2.getY() + ")(" + r2.getWidth() + "," + r2.getHeight() + ")");
