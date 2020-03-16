@@ -56,7 +56,8 @@ public class Rectangle implements Cloneable {
     public int getWidth() { return this.w; }
     public void setWidth(int width) { this.w = width; }
     
-    public int getMaxSide() { return Math.max(this.w, this.h); }
+    public int getShorterSide() { return Math.min(this.w, this.h); }
+    public int getLongerSide() { return Math.max(this.w, this.h); }
 
     public int getVerticalReach() { return this.y + this.h; }
     public int getHorizontalReach() { return this.x + this.w; }
@@ -104,6 +105,38 @@ public class Rectangle implements Cloneable {
     @Override
     public String toString(){
         return String.format("{pos: (%d, %d), size: (%d, %d)", x, y, w, h);
+    }
+    
+    /**
+     * Check whether the given rectangle is covered by the object.
+     * @param other
+     * @return whether this covers other
+     */
+    public boolean covers(Rectangle other){
+        return (this.getVerticalReach() >= other.getVerticalReach() &&
+                this.getHorizontalReach() >= other.getHorizontalReach() &&
+                this.getX() <= other.getX() &&
+                this.getY() <= other.getY());
+    }
+    
+    /**
+     * Reverse of covers
+     * @param r
+     * @return whether r covers this rectangle
+     */
+    public boolean isCoveredBy(Rectangle r){
+        return r.covers(this);
+    }
+    
+    /**
+     * Returns whether two rectangles overlap
+     * @param r1 First rectangle
+     * @param r2 Second rectangle
+     * @return whether r1 and r2 overlap
+     */
+    public static boolean overlaps(Rectangle r1, Rectangle r2){
+        return ( r2.x < r1.getHorizontalReach() && r2.y < r1.getVerticalReach()
+              && r1.x < r2.getHorizontalReach() && r1.y < r2.getVerticalReach());
     }
 
 }

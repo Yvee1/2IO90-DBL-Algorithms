@@ -26,7 +26,7 @@ public class BasicBinPacking implements AlgorithmInterface {
         rs = pp.getRectangles();
         rotationsAllowed = pp.getSettings().rotation;
         // sort in decreasing 'size'
-        Arrays.sort(rs, Comparator.comparing(Rectangle::getMaxSide).reversed());
+        Arrays.sort(rs, Comparator.comparing(Rectangle::getLongerSide).reversed());
         
         // initial rectangle size
         container = new Rectangle(0, 0, rs[0].getWidth(), rs[0].getHeight());
@@ -140,7 +140,7 @@ public class BasicBinPacking implements AlgorithmInterface {
         
         // Smallest 'size' at the end of arraylist
         if (horizontalSpace != null && verticalSpace != null){
-            if (horizontalSpace.getMaxSide() > verticalSpace.getMaxSide()){
+            if (horizontalSpace.getLongerSide() > verticalSpace.getLongerSide()){
 //                System.out.print("Vertical space: ");
 //                System.out.println(verticalSpace);
                 emptySpaces.add(verticalSpace);
