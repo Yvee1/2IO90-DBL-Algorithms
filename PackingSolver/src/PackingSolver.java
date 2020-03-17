@@ -27,13 +27,13 @@ public class PackingSolver {
             solvers = new AlgorithmInterface[1];
             solvers[0] = ai;
         } else { 
-            ai = new BasicBinPacking(); 
+            ai = new MaxRectsSolver(); 
             if (p.getSettings().fixed){
                 solvers = new AlgorithmInterface[]
-                {new BestFitFast(), new SteinbergSolver()};
+                {new MaxRectsSolver(), new BestFitFast(), new SteinbergSolver()};
             } else {
                 solvers = new AlgorithmInterface[]
-                {new BasicBinPacking(), new BestFitFast(), new SteinbergSolver()};
+                {new MaxRectsSolver(), new BasicBinPacking(), new BestFitFast(), new SteinbergSolver()};
             }
         }
 
@@ -82,7 +82,7 @@ public class PackingSolver {
         }
 
         // Verify the solutios validity
-        checkValidity(bestSolution.problem.getRectangles(), p.getSettings());
+//        checkValidity(bestSolution.problem.getRectangles(), p.getSettings());
 
         /* Sort rectangles by id. */
         Arrays.sort(bestSolution.problem.getRectangles(), new Comparator<Rectangle>() {
@@ -97,7 +97,7 @@ public class PackingSolver {
 //        System.out.println("Best solution");
 //        System.out.println(bestSolution.area());
 
-        Visualizer.visualize(bestSolution);
+//        Visualizer.visualize(bestSolution);
     }
 
     /**
