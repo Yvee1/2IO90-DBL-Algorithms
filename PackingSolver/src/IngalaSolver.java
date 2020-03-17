@@ -5,7 +5,7 @@ public class IngalaSolver implements AlgorithmInterface {
     PackingProblem pp;
     
     // large constant
-    final int C = 1000;
+    final int C = 3;
     
     // optimal height
     private int OPT;
@@ -21,10 +21,10 @@ public class IngalaSolver implements AlgorithmInterface {
         epsilon >= deltaH > muH > 0
         epsilon >= deltaW > muW > 0
     */
-    private final double epsilon = 1/10; // currently a random value, prob. incorrect
+    private final double epsilon = (double) 1/4; // currently a random value, prob. incorrect
     
     // split between medium / vertical rectangles
-    private final double deltaH = 1/11; // incorrect value, but then it compiles
+    private final double deltaH = (double) 1/3; // incorrect value, but then it compiles
     
     // split between medium / horizontal rectangles
     // deltaW != deltaH
@@ -46,18 +46,16 @@ public class IngalaSolver implements AlgorithmInterface {
     }
     
     private CategorizedRectangle[] crs;
-    private ArrayList<CategorizedRectangle> largeRs;
-    private ArrayList<CategorizedRectangle> tallRs;
-    private ArrayList<CategorizedRectangle> verticalRs;
-    private ArrayList<CategorizedRectangle> horizontalRs;
-    private ArrayList<CategorizedRectangle> smallRs;
-//    private ArrayList<CategorizedRectangle> nonSmallRs;
-//    private ArrayList<CategorizedRectangle> LTV;
-    private ArrayList<CategorizedRectangle> mediumRs;
+    private ArrayList<CategorizedRectangle> largeRs = new ArrayList<>();
+    private ArrayList<CategorizedRectangle> tallRs= new ArrayList<>();
+    private ArrayList<CategorizedRectangle> verticalRs= new ArrayList<>();
+    private ArrayList<CategorizedRectangle> horizontalRs= new ArrayList<>();
+    private ArrayList<CategorizedRectangle> smallRs= new ArrayList<>();
+    private ArrayList<CategorizedRectangle> mediumRs =  new ArrayList<>();
     // Rectangles in set A := {R is Medium | height in (muH*OPT, deltaH*OPT)}
-    private ArrayList<CategorizedRectangle> A;
+    private ArrayList<CategorizedRectangle> A = new ArrayList<>();
     // nonA = mediumRs - A
-    private ArrayList<CategorizedRectangle> nonA;
+    private ArrayList<CategorizedRectangle> nonA = new ArrayList<>();
     
     private double f(double x){
         return Math.pow(epsilon * x, C / (epsilon*x));
@@ -65,10 +63,17 @@ public class IngalaSolver implements AlgorithmInterface {
     
     @Override
     public PackingSolution solve(PackingProblem p){
+        // lower bound
+        OPT = p.largestWidth;
         this.pp = p;
         // set some variables
         W = p.getSettings().getMaxHeight();
         final Rectangle[] rs = p.getRectangles();
+        
+        
+        System.out.println("Large when h >= " + deltaH * OPT + ", w >= " + deltaW * W);
+        System.out.println("Small when h <= " + muH * OPT + ", w <= " + muW * W);
+        //h <= muH * OPT && w <= muW * W
         
         // categorize rectangles
         crs = new CategorizedRectangle[rs.length];
@@ -123,10 +128,15 @@ public class IngalaSolver implements AlgorithmInterface {
     private Box packInBMhor(){
         final int stripWidth = pp.getSettings().maxHeight;
         final int n = A.size();
+        if (n == 0){
+            return new Box(0, 0, new Rectangle[]{});
+        }
+        System.out.println(n);
         PackingSettings ps = new PackingSettings(true, stripWidth, false, n);
         Rectangle[] arrayA = new Rectangle[n];
         for (int i = 0; i < n; i++){
             arrayA[i] = A.get(i).r;
+            System.out.println(A.get(i).r);
         }
         PackingProblem pp = new PackingProblem(ps, arrayA);
         AlgorithmInterface nfdh = new NFDH();
@@ -139,6 +149,9 @@ public class IngalaSolver implements AlgorithmInterface {
 //         alpha * OPT not necessarily integer I think
         final int stripWidth = (int) alpha * OPT;
         final int n = nonA.size();
+        if (n == 0){
+            return new Box(0, 0, new Rectangle[]{});
+        }
         PackingSettings ps = new PackingSettings(true, stripWidth, false, n);
         Rectangle[] arrayNonA = new Rectangle[n];
         for (int i = 0; i < n; i++){
@@ -149,6 +162,7 @@ public class IngalaSolver implements AlgorithmInterface {
         PackingSolution sol = nfdh.solve(pp);
         Box mVer = new Box(sol.height, sol.width, arrayNonA);
         mVer.rotate();
+        mVer.translate(n, n);
         return mVer;
     }
     
@@ -160,6 +174,19 @@ public class IngalaSolver implements AlgorithmInterface {
             this.rectangles = rs;
         }
         
+        @Override
+        public void rotate(){
+            super.rotate();
+            for (Rectangle r : rectangles){
+                r.rotate();
+            }
+        }
+        
+        public void translate(int dx, int dy){
+            for (Rectangle r : rectangles){
+                r.setPos(r.getWidth() + dx, r.getHeight() + dy);
+            }
+        }
     }
     
     /*
@@ -202,7 +229,7 @@ public class IngalaSolver implements AlgorithmInterface {
         }
         
         public int getActualWidth(){
-            return r.getWidth();
+            return r.getHeight();
         }
         
         public int getHeight(){
@@ -210,35 +237,42 @@ public class IngalaSolver implements AlgorithmInterface {
         }
         
         public int getActualHeight(){
-            return r.getHeight();
+            return r.getWidth();
         }
 
         private void determineCategory(){
-            final int w = getWidth();
-            final int h = getHeight();
+            final int w = getActualWidth();
+            final int h = getActualHeight();
+            System.out.println("Width " + w + ", height: " + h);
             
             // large
             if (h >= deltaH * OPT && w >= deltaW * W){
+                System.out.println("Large");
                 c = Category.L;
             }
             // tall
             else if (h > alpha * OPT && w < deltaW * W){
+                System.out.println("Tall");
                 c = Category.T;
             }
             // vertical
             else if (h > deltaH * OPT && h < alpha * OPT && w <= muW * W){
+                System.out.println("Vertical");
                 c = Category.V;
             } 
             // horizontal
             else if (h < muH * OPT && w >= deltaW * W){
+                System.out.println("Horizontal");
                 c = Category.H;
             }
             // small
             else if (h <= muH * OPT && w <= muW * W){
+                System.out.println("Small");
                 c = Category.S;
             }
             // medium
             else {
+                System.out.println("Medium");
                 c = Category.M;
             }
         }
