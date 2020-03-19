@@ -1,5 +1,8 @@
 
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 /**
  A class to position a set of rectangles in a certain space such that they do not overlap and that they consume the least
  amount of space using a brute force approach
@@ -28,6 +31,11 @@ class BruteForceSolver implements AlgorithmInterface {
      * The end result
      */
     private PackingSolution solution;
+    
+    /**
+     * The packing problem
+     */
+    private PackingProblem p;
 
     /**
      * The height of the solution
@@ -67,6 +75,16 @@ class BruteForceSolver implements AlgorithmInterface {
      * the final width
      */
     private int finalWidth;
+    
+    /**
+     * the time we let this algo run in sec
+     */
+    private int runTimeInSec;
+    
+    /**
+     * The time at which the algo starts
+     */
+    private long endTimeInMilSec;
 
     /**
      * Gets the optimal solution for an array of rectangles
@@ -96,8 +114,26 @@ class BruteForceSolver implements AlgorithmInterface {
         solution = new PackingSolution(p, finalWidth, containerHeight);
 
         /**
-         * Two different loops depending on whether or not this is fixed
-        */ 
+         * we keep searching for a better solution for about 18 seconds
+         */
+  
+        
+        endTimeInMilSec = System.currentTimeMillis() + runTimeInSec*1000;
+
+        
+        try {
+            iteration();
+        } catch (InterruptedException e) {
+
+        }
+        
+        return solution;
+    }
+    
+    /**
+    * Two different loops depending on whether or not this is fixed
+    */ 
+    private void iteration() throws InterruptedException{
         for (int w = finalWidth; w >= maxRectangleWidth; w--) {
             maxWidth = w;
             while(solution.width*solution.height > w*containerHeight) {
@@ -113,8 +149,6 @@ class BruteForceSolver implements AlgorithmInterface {
                 }
             }           
         }
-        System.out.println(solution.area());
-        return solution;
     }
 
     /**
@@ -123,7 +157,7 @@ class BruteForceSolver implements AlgorithmInterface {
      * @param h height of the container
      * @return whether our rectangles fit inside the given space
      */
-    private boolean doRectanglesFit(int w, int h) {
+    private boolean doRectanglesFit(int w, int h) throws InterruptedException {  
         /**
          * Set the container appropriately
          */
@@ -139,7 +173,10 @@ class BruteForceSolver implements AlgorithmInterface {
         return result;
     }
     
-    private boolean recursePlace(int i) {
+    private boolean recursePlace(int i) throws InterruptedException {
+        if (System.currentTimeMillis() > endTimeInMilSec) {
+            throw new InterruptedException();
+        }
         //System.out.println(i);
         if (i == rectangles.length) {            
             return true;
@@ -349,6 +386,20 @@ class BruteForceSolver implements AlgorithmInterface {
                 solutionArray[x][y] = 0;
             }
         }       
+        
+        this.p = p;
+        
+        switch (p.rectangles.length) {
+            case 25:
+                runTimeInSec = 12;
+                break;
+            case 10:
+                runTimeInSec = 12;
+                break;
+            default:
+                runTimeInSec = 24;
+                break;
+        }
 
 
     }

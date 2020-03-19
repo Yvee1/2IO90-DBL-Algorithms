@@ -21,11 +21,21 @@ public class PackingSolver {
 
         // Decide which algorithm to apply
         AlgorithmInterface ai;
-        if (p.rectangles.length <= 4 && p.largestWidth <= 20 && p.largestHeight <= 20) {
-            ai = new BruteForceSolver();
-
-            solvers = new AlgorithmInterface[1];
-            solvers[0] = ai;
+        if (((p.rectangles.length <= 25 && p.largestHeight < 3500 
+                && p.largestWidth < 3500) || (p.rectangles.length <= 10 
+                && p.largestHeight < 5300 && p.largestWidth < 5300) 
+                || (p.rectangles.length <= 4 && p.largestHeight < 8000 
+                && p.largestWidth < 8000)) && !p.getSettings().rotation) {
+            ai = new BruteForceSolver();   
+            if (p.getSettings().fixed){
+                solvers = new AlgorithmInterface[]
+                {new BruteForceSolver(), new MaxRectsSolver(), 
+                    new BestFitFast(), new SteinbergSolver()};
+            } else {
+                solvers = new AlgorithmInterface[]
+                {new BruteForceSolver(), new MaxRectsSolver(), 
+                    new BasicBinPacking(), new BestFitFast(), new SteinbergSolver()};
+            }
         } else { 
             ai = new MaxRectsSolver(); 
             if (p.getSettings().fixed){

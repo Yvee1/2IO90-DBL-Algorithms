@@ -13,3 +13,6 @@ PackingSolver/Packing/.idea/misc.xml
 /PackingSolver/nbproject/private/
 /PackingSolver/build/
 /PackingSolver/dist/
+PackingSolver/nbproject/build-impl.xml
+PackingSolver/nbproject/genfiles.properties
+PackingSolver/nbproject/project.properties
