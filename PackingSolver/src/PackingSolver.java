@@ -29,21 +29,21 @@ public class PackingSolver {
             ai = new BruteForceSolver();   
             if (p.getSettings().fixed){
                 solvers = new AlgorithmInterface[]
-                {new BruteForceSolver(), new MaxRectsSolver(), 
+                {new BruteForceSolver(), new GlobalMaxRectsSolver(), new MaxRectsSolver(), 
                     new BestFitFast(), new SteinbergSolver()};
             } else {
                 solvers = new AlgorithmInterface[]
-                {new BruteForceSolver(), new MaxRectsSolver(), 
+                {new BruteForceSolver(), new GlobalMaxRectsSolver(), new MaxRectsSolver(), 
                     new BasicBinPacking(), new BestFitFast(), new SteinbergSolver()};
             }
         } else { 
             ai = new MaxRectsSolver(); 
             if (p.getSettings().fixed){
                 solvers = new AlgorithmInterface[]
-                {new MaxRectsSolver(), new BestFitFast(), new SteinbergSolver()};
+                {new GlobalMaxRectsSolver(), new MaxRectsSolver(), new BestFitFast(), new SteinbergSolver()};
             } else {
                 solvers = new AlgorithmInterface[]
-                {new MaxRectsSolver(), new BasicBinPacking(), new BestFitFast(), new SteinbergSolver()};
+                {new GlobalMaxRectsSolver(), new MaxRectsSolver(), new BasicBinPacking(), new BestFitFast(), new SteinbergSolver()};
             }
         }
 
