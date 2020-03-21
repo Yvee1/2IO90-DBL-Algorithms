@@ -68,7 +68,7 @@ public class SolverTester {
             avgDens += tc.getDensity();
             i++;
         }
-        avgDens /= (i - j);
+        avgDens /= (i - j - 1);
         System.out.println("Average Density: " + avgDens);
         stop();
     }
