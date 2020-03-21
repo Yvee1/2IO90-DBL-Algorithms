@@ -12,6 +12,8 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Random;
 import java.util.Scanner;
 import javax.swing.JFrame;
@@ -43,6 +45,9 @@ public class Visualizer extends JPanel  {
     private boolean debug = false;
     private int count = 0;
     
+    private static boolean dashedBox;
+    private static boolean oneToOne;
+    
     public Visualizer(){
         if (!debug){
             count = Integer.MAX_VALUE;
@@ -71,7 +76,7 @@ public class Visualizer extends JPanel  {
             sr = new SolutionReader();
         }
         
-        visualize(sr.readSolution());
+        visualize(sr.readSolution(), false, true);
     }
     
     @Override
@@ -91,13 +96,15 @@ public class Visualizer extends JPanel  {
             //creates a copy of the Graphics instance
             Graphics2D g2d = (Graphics2D) g.create();
 
-            //set the stroke of the copy, not the original 
-            Stroke dashed = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0);
-            g2d.setStroke(dashed);
-            g2d.setColor(Color.BLACK);
-            g2d.drawRect(0, 0, (int) (ps.width * scaling), (int) (boxHeight * scaling));
-            //gets rid of the copy
-            g2d.dispose();
+            if (dashedBox){
+                //set the stroke of the copy, not the original 
+                Stroke dashed = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0);
+                g2d.setStroke(dashed);
+                g2d.setColor(Color.BLACK);
+                g2d.drawRect(0, 0, (int) (ps.width * scaling), (int) (boxHeight * scaling));
+                //gets rid of the copy
+                g2d.dispose();
+            }
             
             
 //            for (Rectangle r : ps.problem.getRectangles()){
@@ -138,10 +145,12 @@ public class Visualizer extends JPanel  {
         
     }
     
-    public static void visualize(PackingSolution ps_){
+    public static void visualize(PackingSolution ps_, boolean oneToOne_, boolean dashedBox_){
+        dashedBox = dashedBox_;
+        oneToOne = oneToOne_;
         ps = ps_;
         rs = ps.problem.getRectangles();
-
+        
         boxWidth = ps.width;
         if (ps.problem.settings.fixed){
             boxHeight = ps.problem.settings.getMaxHeight();
@@ -149,17 +158,22 @@ public class Visualizer extends JPanel  {
             boxHeight = ps.height;
         }
         
-        // Make proper size window
-        final double aspectRatio = (double) boxWidth / boxHeight;
-        if (aspectRatio > 1){
-            windowWidth = maxWindowSize;
-            windowHeight = (int) (windowWidth / aspectRatio);
-        } else{
-            windowHeight = maxWindowSize;
-            windowWidth = (int) (windowHeight * aspectRatio);
+        if (oneToOne){
+            windowWidth = boxWidth;
+            windowHeight = boxHeight;
+            scaling = 1;
+        } else {
+            // Make proper size window
+            final double aspectRatio = (double) boxWidth / boxHeight;
+            if (aspectRatio > 1){
+                windowWidth = maxWindowSize;
+                windowHeight = (int) (windowWidth / aspectRatio);
+            } else{
+                windowHeight = maxWindowSize;
+                windowWidth = (int) (windowHeight * aspectRatio);
+            }
+            scaling = (double) windowWidth / ps.width;
         }
-        
-        scaling = (double) windowWidth / ps.width;
         
         // preparing the window
         SwingUtilities.invokeLater(new Runnable() {
@@ -170,14 +184,16 @@ public class Visualizer extends JPanel  {
                 frame.pack();
                 frame.addComponentListener(new ComponentAdapter() {
                     public void componentResized(ComponentEvent componentEvent) {
-                        Dimension d = frame.getContentPane().getSize();
-                        windowWidth = d.width;
-                        windowHeight = d.height;
+                        if (!oneToOne){
+                            Dimension d = frame.getContentPane().getSize();
+                            windowWidth = d.width;
+                            windowHeight = d.height;
 
-                        double ratioH = (double) windowHeight / boxHeight;
-                        double ratioW = (double) windowWidth / boxWidth;
+                            double ratioH = (double) windowHeight / boxHeight;
+                            double ratioW = (double) windowWidth / boxWidth;
 
-                        scaling = Math.min(ratioW, ratioH);
+                            scaling = Math.min(ratioW, ratioH);
+                        }
                     }
                 });
                 frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

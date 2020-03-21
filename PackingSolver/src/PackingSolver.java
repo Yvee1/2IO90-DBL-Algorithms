@@ -10,7 +10,7 @@ public class PackingSolver {
      */
     static void run() {
         boolean multipleSolvers = true;
-        boolean debug = false;
+        boolean debug = true;
 
         // Read the problem from input
         InputReader reader = new InputReader();
@@ -43,7 +43,7 @@ public class PackingSolver {
         }
 
         if (debug){
-            Visualizer.visualize(solution);
+            Visualizer.visualize(solution, true, false);
         }
     }
 
