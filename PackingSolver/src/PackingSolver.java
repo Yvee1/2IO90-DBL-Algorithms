@@ -10,6 +10,7 @@ public class PackingSolver {
      */
     static void run() {
         boolean multipleSolvers = true;
+        boolean debug = false;
 
         // Read the problem from input
         InputReader reader = new InputReader();
@@ -18,29 +19,32 @@ public class PackingSolver {
         PackingSolution solution;
 
         if (multipleSolvers){
-            solution = new CompoundSolver().solve(p);
+            solution = new CompoundSolver(debug).solve(p);
         } else {
             // Decide which algorithm to apply
             AlgorithmInterface ai;
-            ai = new BruteForceSolver();
+            ai = new MaxRectsSolver(new BSSF(), new DESCSS());
         
             solution = ai.solve(p);
         }
 
         // Verify the solutios validity
-        checkValidity(solution.problem.getRectangles(), p.getSettings());
+        if (debug){
+            checkValidity(solution.problem.getRectangles(), p.getSettings());
+        }
 
         /* Sort rectangles by id. */
         Arrays.sort(solution.problem.getRectangles(), (Rectangle a, Rectangle b) -> Integer.compare(a.id, b.id));
 
         // Print the solution
         OutputPrinter printer = new OutputPrinter();
-//        printer.printSolution(bestSolution);
-        System.out.println("------");
-        System.out.println("Best solution");
-        System.out.println(solution.area());
+        if (!debug){
+            printer.printSolution(solution);
+        }
 
-        Visualizer.visualize(solution);
+        if (debug){
+            Visualizer.visualize(solution);
+        }
     }
 
     /**

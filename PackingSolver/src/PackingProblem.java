@@ -34,5 +34,11 @@ public class PackingProblem {
 
     public int getLargestWidth() { return this.largestWidth; }
     public int getLargestHeight() { return this.largestHeight; }
+    
+    public void reset(){
+        for (Rectangle r : rectangles){
+            r.setPos(-1, -1);
+        }
+    }
 
 }

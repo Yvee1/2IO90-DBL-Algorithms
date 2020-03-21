@@ -1,14 +1,11 @@
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-
 
 /**
  *
  * @author Steven van den Broek
  */
-public abstract class MaxRectsSolver implements AlgorithmInterface {
+public class MaxRectsSolver implements AlgorithmInterface {
     // Set F of free rectangles
     ArrayList<Rectangle> emptySpaces = new ArrayList<>();
     // whether rotations are allowed
@@ -22,8 +19,14 @@ public abstract class MaxRectsSolver implements AlgorithmInterface {
     
     boolean debug = false;
     
-    abstract void sortRectangles();
-    abstract BestFitResult findBestSpace(Rectangle r);
+//    abstract void sortRectangles();
+    MaxRectsSortingSubroutine mrss;
+    MaxRectsHeuristicSubroutine mrhs;
+    
+    MaxRectsSolver(MaxRectsHeuristicSubroutine mrhs, MaxRectsSortingSubroutine mrss){
+        this.mrss = mrss;
+        this.mrhs = mrhs;
+    }
     
     @Override
     public PackingSolution solve(PackingProblem pp){
@@ -32,7 +35,7 @@ public abstract class MaxRectsSolver implements AlgorithmInterface {
         fixed = pp.getSettings().fixed;
         rotationsAllowed = pp.getSettings().rotation;
         
-        sortRectangles();
+        mrss.sortRectangles(rs);
         
         if (fixed){
             container = new Rectangle(0, 0, rs[0].getWidth(), pp.getSettings().getMaxHeight());
@@ -54,7 +57,7 @@ public abstract class MaxRectsSolver implements AlgorithmInterface {
                 System.out.println();
             }
             
-            BestFitResult bfr = findBestSpace(r);
+            BestFitResult bfr = mrhs.findBestSpace(r, emptySpaces, rotationsAllowed);
             
             if (bfr.fits){
                 if (bfr.shouldBeRotated){
@@ -106,18 +109,9 @@ public abstract class MaxRectsSolver implements AlgorithmInterface {
         return new PackingSolution(pp);
     }
     
-    FitResult fitsInto(Rectangle r1, Rectangle r2){
-        boolean fits = false;
-        boolean shouldBeRotated = false;
-        
-        fits = r1.getWidth()  <= r2.getWidth()
+    public static boolean fitsInto(Rectangle r1, Rectangle r2){
+        return r1.getWidth()  <= r2.getWidth()
             && r1.getHeight() <= r2.getHeight();
-        if (!fits && rotationsAllowed){
-            fits = r1.getHeight()  <= r2.getWidth()
-                && r1.getWidth() <= r2.getHeight();
-            shouldBeRotated = true;
-        }
-        return new FitResult(fits, shouldBeRotated);
     }
     
     private void packAndSplit(Rectangle r, int i){
@@ -218,28 +212,6 @@ public abstract class MaxRectsSolver implements AlgorithmInterface {
         
         for (int i : toRemove){
             emptySpaces.remove(i);
-        }
-    }
-    
-    class FitResult {
-        boolean fits;
-        boolean shouldBeRotated;
-        
-        FitResult(boolean fits, boolean sbr){
-            shouldBeRotated = sbr;
-            this.fits = fits;
-        }
-    }
-    
-    class BestFitResult {
-        boolean fits;
-        boolean shouldBeRotated;
-        int bestFit;
-        
-        BestFitResult(boolean fits, boolean sbr, int bf){
-            shouldBeRotated = sbr;
-            this.fits = fits;
-            bestFit = bf;
         }
     }
 }

@@ -23,6 +23,8 @@ public class GlobalMaxRectsSolver implements AlgorithmInterface {
     
     @Override
     public PackingSolution solve(PackingProblem pp){
+        pp.reset();
+        
         // set the rectangles
         rs = pp.getRectangles();
         fixed = pp.getSettings().fixed;

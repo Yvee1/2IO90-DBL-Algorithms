@@ -62,9 +62,8 @@ public class Rectangle implements Cloneable {
     public int getVerticalReach() { return this.y + this.h; }
     public int getHorizontalReach() { return this.x + this.w; }
 
-    public int getArea() {
-        return this.w * this.h;
-    }
+    public int getArea() { return this.w * this.h; }
+    public int getPerimeter() { return this.w + this.h; }
 
     /**
      * Rotate the rectangle by swapping width and height.
