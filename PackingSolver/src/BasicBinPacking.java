@@ -15,7 +15,7 @@ public class BasicBinPacking implements AlgorithmInterface {
     Rectangle[] rs;
     boolean rotationsAllowed;
     Rectangle container;
-    ArrayList<Rectangle> emptySpaces = new ArrayList();
+    ArrayList<Rectangle> emptySpaces = new ArrayList<>();
     
     @Override
     public PackingSolution solve(PackingProblem pp){

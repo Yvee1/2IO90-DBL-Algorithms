@@ -11,103 +11,36 @@ public class PackingSolver {
     static void run() {
         boolean multipleSolvers = true;
 
-        // Read the problem from inpit
+        // Read the problem from input
         InputReader reader = new InputReader();
         PackingProblem p = reader.readProblem();
-        long bigBang = System.currentTimeMillis();
-        
-        // Array of solvers to use in order of non-increasing running-time
-        AlgorithmInterface[] solvers;
 
-        // Decide which algorithm to apply
-        AlgorithmInterface ai;
-        if (((p.rectangles.length <= 25 && p.largestHeight < 3500 
-                && p.largestWidth < 3500) || (p.rectangles.length <= 10 
-                && p.largestHeight < 5300 && p.largestWidth < 5300) 
-                || (p.rectangles.length <= 4 && p.largestHeight < 8000 
-                && p.largestWidth < 8000)) && !p.getSettings().rotation) {
-            ai = new BruteForceSolver();   
-            if (p.getSettings().fixed){
-                solvers = new AlgorithmInterface[]
-                {new BruteForceSolver(), new GlobalMaxRectsSolver(), new MaxRectsSolver(), 
-                    new BestFitFast(), new SteinbergSolver()};
-            } else {
-                solvers = new AlgorithmInterface[]
-                {new BruteForceSolver(), new GlobalMaxRectsSolver(), new MaxRectsSolver(), 
-                    new BasicBinPacking(), new BestFitFast(), new SteinbergSolver()};
-            }
-        } else { 
-            ai = new MaxRectsSolver(); 
-            if (p.getSettings().fixed){
-                solvers = new AlgorithmInterface[]
-                {new GlobalMaxRectsSolver(), new MaxRectsSolver(), new BestFitFast(), new SteinbergSolver()};
-            } else {
-                solvers = new AlgorithmInterface[]
-                {new GlobalMaxRectsSolver(), new MaxRectsSolver(), new BasicBinPacking(), new BestFitFast(), new SteinbergSolver()};
-            }
-        }
+        PackingSolution solution;
 
-        
-        PackingSolution bestSolution = null;
-        
-        // Do some more stuff based on time left
         if (multipleSolvers){
-            PackingProblem altP = new PackingProblem(p);
-            
-            // seconds used for previous algorithm
-            double secondsUsed = 0;
-            // seconds left till total time reaches 30
-            double secondsLeft = 30 - (System.currentTimeMillis() - bigBang) / 1000;
-            
-            boolean useAlt = true;
-            for (int i = 0; i < solvers.length && secondsLeft > secondsUsed; i++){
-                long startTime = System.currentTimeMillis();
-                PackingSolution sol;
-                if (useAlt){
-                    sol = solvers[i].solve(altP);
-                } else {
-                    sol = solvers[i].solve(p);
-                }
-                long endTime = System.currentTimeMillis();
-                long time = endTime - startTime;
-                
-                secondsUsed = (double) time / 1000;
-                secondsLeft = 30 - secondsUsed;
-               
-//                System.out.println();
-//                System.out.println(solvers[i].getClass().getName());
-//                System.out.println(sol.area());
-                
-                if (bestSolution == null || sol.area() < bestSolution.area()){
-                    bestSolution = sol;
-                    useAlt = !useAlt;
-                }
-            }
+            solution = new CompoundSolver().solve(p);
         } else {
-            // Run the algorithm and time the operation time
-            long startTime = System.currentTimeMillis();
-            bestSolution = ai.solve(p);
-            long endTime = System.currentTimeMillis();
-            long time = endTime - startTime;
+            // Decide which algorithm to apply
+            AlgorithmInterface ai;
+            ai = new BruteForceSolver();
+        
+            solution = ai.solve(p);
         }
 
         // Verify the solutios validity
-//        checkValidity(bestSolution.problem.getRectangles(), p.getSettings());
+        checkValidity(solution.problem.getRectangles(), p.getSettings());
 
         /* Sort rectangles by id. */
-        Arrays.sort(bestSolution.problem.getRectangles(), new Comparator<Rectangle>() {
-           @Override
-           public int compare(Rectangle a, Rectangle b) { return Integer.compare(a.id, b.id); }
-        });
+        Arrays.sort(solution.problem.getRectangles(), (Rectangle a, Rectangle b) -> Integer.compare(a.id, b.id));
 
         // Print the solution
         OutputPrinter printer = new OutputPrinter();
-        printer.printSolution(bestSolution);
-//        System.out.println("------");
-//        System.out.println("Best solution");
-//        System.out.println(bestSolution.area());
+//        printer.printSolution(bestSolution);
+        System.out.println("------");
+        System.out.println("Best solution");
+        System.out.println(solution.area());
 
-//        Visualizer.visualize(bestSolution);
+        Visualizer.visualize(solution);
     }
 
     /**
