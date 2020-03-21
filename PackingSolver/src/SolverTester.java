@@ -53,7 +53,7 @@ public class SolverTester {
                     checkValidity(Arrays.asList(tc.getSolution().problem.getRectangles()), tc.getSolution().problem.getSettings());
                 } catch (Exception e) {
                     System.out.println(e);
-                    Visualizer.visualize(tc.getSolution());
+                    Visualizer.visualize(tc.getSolution(),false, true);
                     break;
                 }
             } else {
@@ -79,7 +79,7 @@ public class SolverTester {
         String input = sc.next().trim();
         while (input.length() != 0) {
             System.out.println("Visualising " + testCases.get(Integer.parseInt(input)).getPath());
-            Visualizer.visualize(testCases.get(Integer.parseInt(input)).getSolution());
+            Visualizer.visualize(testCases.get(Integer.parseInt(input)).getSolution(), false, true);
             System.out.println("Visualize the following case (enter to skip or e.g.'35'):");
             input = sc.next().trim();
         }
