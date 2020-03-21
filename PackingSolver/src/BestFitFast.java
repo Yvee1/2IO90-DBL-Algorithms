@@ -231,14 +231,24 @@ public class BestFitFast implements AlgorithmInterface {
             int x_cache = r.x;
             int y_cache = r.y;
 
-            /* Rotate r. */
-            r.rotate();
-
             /* Update the skyline. */
             SkylineSegment seg = topSegments[r.id];
+
+            /* The skyline segment that was created on top of r might have been merged. */
+            /* Then the segment is no longer in the skyline heap. */
+            /* Fixing this requires keeping track of all rectangles a segment lies on top of, */
+            /*  and update their topSegment when the segments are merged during the adding of a rectangle. */
+            /* This provably increasing the running to O(n^2). */
+            /* A compromise can be made by running until the failure condition is detected. */
+            //assert(skyline.contains(seg));
+            if (!skyline.contains(seg)) { return; }
+
             skyline.remove(seg);
             seg.x = r.x;
             skyline.add(seg);
+
+            /* Rotate r. */
+            r.rotate();
 
             /* Find the leftmost segment, and raise until r fits. */
             SkylineSegment left = skyline.poll();
@@ -268,7 +278,6 @@ public class BestFitFast implements AlgorithmInterface {
 
             /* Update new width if improved. */
             width = newWidth;
-
         }
 
     }
@@ -280,6 +289,7 @@ class SkylineSegment {
     int x;
     int len;
     int y;
+    Rectangle atop = null;
 
     SkylineSegment top, bottom;
 

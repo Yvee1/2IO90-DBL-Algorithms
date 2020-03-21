@@ -28,7 +28,7 @@ public class CompoundSolver implements AlgorithmInterface {
         
         // Array of solvers to use in order of non-increasing running-time
         ArrayList<AlgorithmInterface> solvers = new ArrayList<>();
-//        solvers.add(new BestFitFast());
+          solvers.add(new BestFitFast());
         solvers.add(new SteinbergSolver());
         solvers.add(new GlobalMaxRectsSolver());
         solvers.add(new GlobalMaxRectsSolver1());

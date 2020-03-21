@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.*;
 //import Visualizer;
 
@@ -12,8 +13,12 @@ public class PackingSolver {
         boolean multipleSolvers = true;
         boolean debug = true;
 
+        Scanner sc = null;
+        try { sc = new Scanner(new File("D:\\Windows\\Documents\\TUe\\Y2\\Q3\\2IO90 DBL Algorithms\\software\\Testcases\\AH\\AH103.txt")); }
+        catch (Exception e) {}
+
         // Read the problem from input
-        InputReader reader = new InputReader();
+        InputReader reader = new InputReader(sc);
         PackingProblem p = reader.readProblem();
 
         PackingSolution solution;
@@ -23,7 +28,7 @@ public class PackingSolver {
         } else {
             // Decide which algorithm to apply
             AlgorithmInterface ai;
-            ai = new MaxRectsSolver(new BSSF(), new DESCSS());
+            ai = new BestFitFast();
         
             solution = ai.solve(p);
         }
@@ -43,7 +48,7 @@ public class PackingSolver {
         }
 
         if (debug){
-            Visualizer.visualize(solution, true, false);
+            Visualizer.visualize(solution, false, false);
         }
     }
 
