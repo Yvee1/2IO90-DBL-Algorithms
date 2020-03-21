@@ -10,12 +10,15 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Random;
 import java.util.Scanner;
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -36,6 +39,7 @@ public class Visualizer extends JPanel  {
     private static int windowHeight;
     // scaling that is done from original rectangle to rectangle that is drawn 
     private static double scaling;
+    boolean saved = false;
     // packing solution to draw
     static PackingSolution ps;
     // random number generator
@@ -54,6 +58,7 @@ public class Visualizer extends JPanel  {
         }
         
         setPreferredSize(new Dimension(windowWidth, windowHeight));
+        setMinimumSize(new Dimension(windowWidth, windowHeight));
         addMouseListener(new MouseAdapter(){
                     @Override
                     public void mouseClicked(MouseEvent e){
@@ -179,9 +184,11 @@ public class Visualizer extends JPanel  {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 JFrame frame = new JFrame(String.format("area: %d, density: %.2f", ps.area(), ps.density() * 100));
-                
+
+                if (oneToOne) { frame.setMinimumSize(new Dimension(windowWidth+100, windowHeight+50)); }
                 frame.add(new Visualizer());
                 frame.pack();
+
                 frame.addComponentListener(new ComponentAdapter() {
                     public void componentResized(ComponentEvent componentEvent) {
                         if (!oneToOne){
