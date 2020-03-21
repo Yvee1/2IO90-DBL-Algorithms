@@ -13,12 +13,8 @@ public class PackingSolver {
         boolean multipleSolvers = true;
         boolean debug = true;
 
-        Scanner sc = null;
-        try { sc = new Scanner(new File("D:\\Windows\\Documents\\TUe\\Y2\\Q3\\2IO90 DBL Algorithms\\software\\Testcases\\AH\\AH103.txt")); }
-        catch (Exception e) {}
-
         // Read the problem from input
-        InputReader reader = new InputReader(sc);
+        InputReader reader = new InputReader();
         PackingProblem p = reader.readProblem();
 
         PackingSolution solution;
