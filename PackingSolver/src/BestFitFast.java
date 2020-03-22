@@ -94,9 +94,9 @@ public class BestFitFast implements AlgorithmInterface {
             usedRectangles[index++] = w.orig;
         }
 
-        if (p.settings.rotation) {
-            postProcess(p);
-        }
+//        if (p.settings.rotation) {
+//            postProcess(p);
+//        }
 
         p.rectangles = usedRectangles;
 
@@ -242,6 +242,9 @@ public class BestFitFast implements AlgorithmInterface {
             /* A compromise can be made by running until the failure condition is detected. */
             //assert(skyline.contains(seg));
             if (!skyline.contains(seg)) { return; }
+
+            /* The same thing goes for the length of the segment. */
+            if (seg.len != r.h) { return; }
 
             skyline.remove(seg);
             seg.x = r.x;
