@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -22,52 +24,64 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.WindowConstants;
 
 
 /**
  *
- * @author 20182300
+ * @author Steven van den Broek
  */
 public class Visualizer extends JPanel  {
-    private final Color[] palette = new Color[] {Color.decode("#db4549"), Color.decode("#d1e1e1"), Color.decode("#3e6a90"), Color.decode("#2e3853"), Color.decode("#a3c9d3")};
+    // color palette
+    private final static Color[] palette = new Color[] 
+    {Color.decode("#db4549"), Color.decode("#d1e1e1"), Color.decode("#3e6a90"),
+        Color.decode("#2e3853"), Color.decode("#a3c9d3")};
+    
     // maximum window size
     private final static int maxWindowSize = 500;
-    private static int boxHeight;
-    private static int boxWidth;
-    private static int windowWidth;
-    private static int windowHeight;
+    
+    private int boxHeight;
+    private int boxWidth;
+    private int windowWidth;
+    private int windowHeight;
+    
     // scaling that is done from original rectangle to rectangle that is drawn 
-    private static double scaling;
-    boolean saved = false;
+    private double scaling;
+    
     // packing solution to draw
     static PackingSolution ps;
     // random number generator
-    private Random rand = new Random();
+    private static Random rand = new Random();
     
-    private static Rectangle[] rs;
+    private Rectangle[] rs;
+    private ColoredRectangle[] coloredRectangles;
     private boolean debug = false;
-    private int count = 0;
     
-    private static boolean dashedBox;
-    private static boolean oneToOne;
+    // currently when multiple windows are open they start synchronously,
+    // this is intended but can be changed by making the started variable non-static.
+    private static boolean started = false;
+    private final boolean animate = true;
+    private final double animationDuration = 5.0;
+    
+    private final boolean saveAnimation = false;
+    // directory to store animation frame in
+    private static String dir = "C:\\Users\\20182300\\OneDrive - TU Eindhoven\\Documents\\Uni\\Y2\\Q3\\2IO90\\animation";
+    
+    
+    // amount of rectangles to be drawn (used for animation and debugging)
+    private double count = -1;
+    private int currentFrame = 0;
+    
+    private boolean dashedBox;
+    private boolean oneToOne;
     
     public Visualizer(){
-        if (!debug){
+        
+        if (!debug && !animate){
             count = Integer.MAX_VALUE;
         }
         
-        setPreferredSize(new Dimension(windowWidth, windowHeight));
-        setMinimumSize(new Dimension(windowWidth, windowHeight));
-        addMouseListener(new MouseAdapter(){
-                    @Override
-                    public void mouseClicked(MouseEvent e){
-                        if (debug){
-                            count++;
-                        }
-                        repaint();
-                    }
-        });
     }
     
     public static void main(String[] args) throws FileNotFoundException{
@@ -85,7 +99,9 @@ public class Visualizer extends JPanel  {
     }
     
     @Override
-    public void paintComponent(Graphics g) {    
+    public void paintComponent(Graphics g) {
+//        System.out.println(count);
+        
         Graphics2D g2 = (Graphics2D) g;
         AffineTransform oldAT = g2.getTransform();
         try {
@@ -115,97 +131,159 @@ public class Visualizer extends JPanel  {
 //            for (Rectangle r : ps.problem.getRectangles()){
             
             for (int i = 0; i <= count && i < rs.length; i++){
-                Rectangle r = rs[i];
+                ColoredRectangle cr = coloredRectangles[i];
+                Rectangle r = cr.r;
                 if (r.x < 0){
                     continue;
                 }
 
-    //            final float hue = rand.nextFloat();
-                // Saturation between 0.3 and 0.5
-    //            final float saturation = (rand.nextInt(5000) + 3000) / 10000f;
-    //            final float luminance = 0.9f;
-    //            final Color color = Color.getHSBColor(hue, saturation, luminance);
-                final Color color = palette[rand.nextInt(palette.length)];
+                // coloured fill
+                g.setColor(cr.color);
+                g.fillRect((int) (r.x * scaling), (int) (r.y * scaling),
+                           (int) (r.w * scaling), (int) (r.h * scaling));
+                // black stroke
+                g.setColor(Color.BLACK);
+                float minSize = Math.min(r.w * (float) scaling, r.h * (float) scaling);
+                float strokeWidth = Math.min(0.01f * minSize, 1.5f);
+                g2.setStroke(new BasicStroke(strokeWidth));
+                g.drawRect((int) (r.x * scaling), (int) (r.y * scaling),
+                           (int) (r.w * scaling), (int) (r.h * scaling));
 
-
-
-                    // coloured fill
-                    g.setColor(color);
-                    g.fillRect((int) (r.x * scaling), (int) (r.y * scaling),
-                               (int) (r.w * scaling), (int) (r.h * scaling));
-                    // black stroke
-                    g.setColor(Color.BLACK);
-                    float minSize = Math.min(r.w * (float) scaling, r.h * (float) scaling);
-                    float strokeWidth = Math.min(0.01f * minSize, 1.5f);
-                    g2.setStroke(new BasicStroke(strokeWidth));
-                    g.drawRect((int) (r.x * scaling), (int) (r.y * scaling),
-                               (int) (r.w * scaling), (int) (r.h * scaling));
-
-                }
+            }
         }
         finally {
               //restore
               g2.setTransform(oldAT);
         }
         
+        if (started){
+            count += (double) rs.length / animationDuration / 60;
+        }
     }
     
     public static void visualize(PackingSolution ps_, boolean oneToOne_, boolean dashedBox_){
-        dashedBox = dashedBox_;
-        oneToOne = oneToOne_;
-        ps = ps_;
-        rs = ps.problem.getRectangles();
-        
-        boxWidth = ps.width;
-        if (ps.problem.settings.fixed){
-            boxHeight = ps.problem.settings.getMaxHeight();
-        } else{
-            boxHeight = ps.height;
-        }
-        
-        if (oneToOne){
-            windowWidth = boxWidth;
-            windowHeight = boxHeight;
-            scaling = 1;
-        } else {
-            // Make proper size window
-            final double aspectRatio = (double) boxWidth / boxHeight;
-            if (aspectRatio > 1){
-                windowWidth = maxWindowSize;
-                windowHeight = (int) (windowWidth / aspectRatio);
-            } else{
-                windowHeight = maxWindowSize;
-                windowWidth = (int) (windowHeight * aspectRatio);
-            }
-            scaling = (double) windowWidth / ps.width;
-        }
         
         // preparing the window
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                JFrame frame = new JFrame(String.format("area: %d, density: %.2f", ps.area(), ps.density() * 100));
+                
+                Visualizer v = new Visualizer();
+                
+                v.dashedBox = dashedBox_;
+                v.oneToOne = oneToOne_;
+                v.ps = ps_;
+                
 
-                if (oneToOne) { frame.setMinimumSize(new Dimension(windowWidth+100, windowHeight+50)); }
-                frame.add(new Visualizer());
+                if (v.ps.orderedRectangles != null){
+                    v.rs = ps.orderedRectangles;
+                } else {
+                    v.rs = ps.problem.getRectangles();
+                }
+
+                v.coloredRectangles = new ColoredRectangle[v.rs.length];
+                for (int i = 0; i < v.rs.length; i++){
+                    v.coloredRectangles[i] = new ColoredRectangle(v.rs[i], palette[rand.nextInt(palette.length)]);
+                }
+
+                v.boxWidth = ps.width;
+                if (ps.problem.settings.fixed){
+                    v.boxHeight = ps.problem.settings.getMaxHeight();
+                } else{
+                    v.boxHeight = ps.height;
+                }
+
+                if (v.oneToOne){
+                    v.windowWidth = v.boxWidth;
+                    v.windowHeight = v.boxHeight;
+                    v.scaling = 1;
+                } else {
+                    // Make proper size window
+                    final double aspectRatio = (double) v.boxWidth / v.boxHeight;
+                    if (aspectRatio > 1){
+                        v.windowWidth = maxWindowSize;
+                        v.windowHeight = (int) (v.windowWidth / aspectRatio);
+                    } else{
+                        v.windowHeight = maxWindowSize;
+                        v.windowWidth = (int) (v.windowHeight * aspectRatio);
+                    }
+                    v.scaling = (double) v.windowWidth / v.ps.width;
+                }
+        
+                JFrame frame = new JFrame(String.format("area: %d, density: %.2f", ps_.area(), ps_.density() * 100));
+                
+                if (v.oneToOne) { frame.setMinimumSize(new Dimension(v.windowWidth+100, v.windowHeight+50)); }
+                frame.setPreferredSize(new Dimension(v.windowWidth, v.windowHeight));
+                frame.addMouseListener(new MouseAdapter(){
+                            @Override
+                            public void mouseClicked(MouseEvent e){
+                                if (v.debug){
+                                    v.count++;
+                                    v.repaint();
+                                }
+
+                                if (v.animate){
+                                    started = !started;
+                                    v.count = -1;
+                                    v.currentFrame = 0;
+                                }
+                            }
+                });
+                frame.add(v);
                 frame.pack();
-
+                
                 frame.addComponentListener(new ComponentAdapter() {
                     public void componentResized(ComponentEvent componentEvent) {
-                        if (!oneToOne){
+                        if (!v.oneToOne){
                             Dimension d = frame.getContentPane().getSize();
-                            windowWidth = d.width;
-                            windowHeight = d.height;
+                            v.windowWidth = d.width;
+                            v.windowHeight = d.height;
 
-                            double ratioH = (double) windowHeight / boxHeight;
-                            double ratioW = (double) windowWidth / boxWidth;
+                            double ratioH = (double) v.windowHeight / v.boxHeight;
+                            double ratioW = (double) v.windowWidth / v.boxWidth;
 
-                            scaling = Math.min(ratioW, ratioH);
+                            v.scaling = Math.min(ratioW, ratioH);
                         }
                     }
                 });
+                
+                if (v.animate){
+                    // animation loop of ~60fps
+                    ActionListener taskPerformer = new ActionListener() {
+                        public void actionPerformed(ActionEvent evt) {
+                            if (v.started && v.count <= 1.5 * v.rs.length){
+                                frame.repaint();
+
+                                if (v.saveAnimation){
+                                    BufferedImage image = new BufferedImage(v.windowWidth, v.windowHeight, BufferedImage.TYPE_INT_RGB);
+                                    Graphics2D graphics2D = image.createGraphics();
+                                    v.paint(graphics2D);
+
+                                    try {
+                                        ImageIO.write(image,"png", new File(dir + "\\test" + String.format("%04d", (v.currentFrame++)) + ".png"));
+                                    } catch(Exception exc) {
+                                        System.out.println(exc);
+                                    }
+                                }
+                            }
+                        }
+                    };
+                    new Timer((int) 1000.0 / 60, taskPerformer).start();
+                }
                 frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                 frame.setVisible(true);
             }
         });
+        
+        
+    }
+}
+
+class ColoredRectangle {
+    Rectangle r;
+    Color color;
+    
+    ColoredRectangle(Rectangle r, Color color){
+        this.r = r;
+        this.color = color;
     }
 }

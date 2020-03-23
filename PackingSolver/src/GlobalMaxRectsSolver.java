@@ -18,6 +18,10 @@ public class GlobalMaxRectsSolver implements AlgorithmInterface {
     Rectangle container;
     // Reference to the array of rectangles that needs to be placed
     Rectangle[] rs;
+    // Rectangles ordered in the way they were placed
+    Rectangle[] orderedRectangles;
+    // Denotes we are at the nth rectangle
+    int n = 0;
     
     boolean debug = false;
     
@@ -27,6 +31,8 @@ public class GlobalMaxRectsSolver implements AlgorithmInterface {
         
         // set the rectangles
         rs = pp.getRectangles();
+        orderedRectangles = new Rectangle[rs.length];
+        
         fixed = pp.getSettings().fixed;
         rotationsAllowed = pp.getSettings().rotation;
         
@@ -43,6 +49,7 @@ public class GlobalMaxRectsSolver implements AlgorithmInterface {
         }
         emptySpaces.add(container);
 
+        // iterate as many times as there are rectangles
         for (int i = 0; i < rs.length; i++){
 
             boolean fit = false;
@@ -52,6 +59,7 @@ public class GlobalMaxRectsSolver implements AlgorithmInterface {
             int bestFitRectangle = -1;
             int shortestLeftover = Integer.MAX_VALUE;
             
+            // loop over the rectangles
             for (int ri = 0; ri < rs.length; ri++){
                 Rectangle r = rs[ri];
                 
@@ -60,6 +68,7 @@ public class GlobalMaxRectsSolver implements AlgorithmInterface {
                     continue;
                 }
                 
+                // loop over the empty spaces and find the best fit rectangle - empty space pair
                 for (int si = 0; si < emptySpaces.size(); si++){
                     Rectangle space = emptySpaces.get(si);
                     
@@ -165,7 +174,8 @@ public class GlobalMaxRectsSolver implements AlgorithmInterface {
             }
         }
         
-        return new PackingSolution(pp);
+        Visualizer.visualize(new PackingSolution(new PackingProblem(pp.settings, (Rectangle[]) emptySpaces.toArray(new Rectangle[emptySpaces.size()]))), false, false);
+        return new PackingSolution(pp, orderedRectangles);
     }
     
     private Result fitsInto(Rectangle r1, Rectangle r2){
@@ -187,6 +197,8 @@ public class GlobalMaxRectsSolver implements AlgorithmInterface {
         
         // pack r
         r.setPos(space.getX(), space.getY());
+        orderedRectangles[n++] = r;
+        
         if (debug){
             System.out.print("Placed ");
             System.out.print(r);

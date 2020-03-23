@@ -2,14 +2,9 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
-/*
- * Here comes the text of your license
- * Each line should be prefixed with  * 
- */
-
 /**
  *
- * @author 20182300
+ * @author Steven van den Broek
  */
 public class CompoundSolver implements AlgorithmInterface {
     boolean debug;
@@ -28,15 +23,15 @@ public class CompoundSolver implements AlgorithmInterface {
         
         // Array of solvers to use in order of non-increasing running-time
         ArrayList<AlgorithmInterface> solvers = new ArrayList<>();
-          solvers.add(new BestFitFast());
+        solvers.add(new BestFitFast());
         solvers.add(new SteinbergSolver());
-        solvers.add(new GlobalMaxRectsSolver());
-        solvers.add(new GlobalMaxRectsSolver1());
+//        solvers.add(new GlobalMaxRectsSolver());
+//        solvers.add(new GlobalMaxRectsSolver1());
 //        solvers.add(new GlobalMaxRectsSolver2());
         
         if (p.rectangles.length <= 25){
             MaxRectsSortingSubroutine[] mrsss = new MaxRectsSortingSubroutine[]
-            { new DESCSS(), new DESCLS(), new DESCA(), new DESCPERIM(), new ASCSS() };
+            { new DESCSS(), new DESCLS(), new DESCPERIM(), new DESCA() };
 
             MaxRectsHeuristicSubroutine[] mrhss = new MaxRectsHeuristicSubroutine[]
             { new BSSF(), new BLSF(), new BL(), new BAF() };
@@ -47,7 +42,7 @@ public class CompoundSolver implements AlgorithmInterface {
                 }
             }
         } else {
-            solvers.add(new MaxRectsSolver(new BSSF(), new DESCSS()));
+//            solvers.add(new MaxRectsSolver(new BSSF(), new DESCSS()));
         }
         
         if (((p.rectangles.length <= 25 && p.largestHeight < 3500 

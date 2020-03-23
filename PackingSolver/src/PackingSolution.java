@@ -4,6 +4,8 @@ public class PackingSolution {
 
     public int width, height;
     public PackingProblem problem;
+    
+    public Rectangle[] orderedRectangles = null;
 
     public PackingSolution(PackingProblem p) {
         this.problem = p;
@@ -21,9 +23,14 @@ public class PackingSolution {
     }
 
     public PackingSolution(PackingProblem p, int width, int height) {
-        this(p);
+        this.problem = p;
         this.width = width;
         this.height = height;
+    }
+    
+    public PackingSolution(PackingProblem p, Rectangle[] orderedRectangles) {
+        this(p);
+        this.orderedRectangles = orderedRectangles;
     }
 
     public int area(){

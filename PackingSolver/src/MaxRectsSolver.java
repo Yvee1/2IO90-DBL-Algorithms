@@ -16,10 +16,13 @@ public class MaxRectsSolver implements AlgorithmInterface {
     Rectangle container;
     // Reference to the array of rectangles that needs to be placed
     Rectangle[] rs;
+    // Rectangles ordered in the way they were placed
+    Rectangle[] orderedRectangles;
+    // Denotes we are at the nth rectangle
+    int n = 0;
     
     boolean debug = false;
     
-//    abstract void sortRectangles();
     MaxRectsSortingSubroutine mrss;
     MaxRectsHeuristicSubroutine mrhs;
     
@@ -32,6 +35,8 @@ public class MaxRectsSolver implements AlgorithmInterface {
     public PackingSolution solve(PackingProblem pp){
         // set the rectangles
         rs = pp.getRectangles();
+        orderedRectangles = new Rectangle[rs.length];
+        
         fixed = pp.getSettings().fixed;
         rotationsAllowed = pp.getSettings().rotation;
         
@@ -106,7 +111,7 @@ public class MaxRectsSolver implements AlgorithmInterface {
             }
         }
         
-        return new PackingSolution(pp);
+        return new PackingSolution(pp, orderedRectangles);
     }
     
     public static boolean fitsInto(Rectangle r1, Rectangle r2){
@@ -119,6 +124,8 @@ public class MaxRectsSolver implements AlgorithmInterface {
         
         // pack r
         r.setPos(space.getX(), space.getY());
+        orderedRectangles[n++] = r;
+        
         if (debug){
             System.out.print("Placed ");
             System.out.print(r);

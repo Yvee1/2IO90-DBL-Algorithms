@@ -10,7 +10,7 @@ public class PackingSolver {
      * The primary function called by main
      */
     static void run() {
-        boolean multipleSolvers = true;
+        boolean multipleSolvers = false;
         boolean debug = true;
 
         // Read the problem from input
@@ -24,7 +24,8 @@ public class PackingSolver {
         } else {
             // Decide which algorithm to apply
             AlgorithmInterface ai;
-            ai = new BestFitFast();
+//            ai = new MaxRectsSolver(new BSSF(), new DESCSS());
+            ai = new GlobalMaxRectsSolver();
         
             solution = ai.solve(p);
         }
@@ -44,7 +45,7 @@ public class PackingSolver {
         }
 
         if (debug){
-            Visualizer.visualize(solution, false, false);
+            Visualizer.visualize(solution, false, true);
         }
     }
 
