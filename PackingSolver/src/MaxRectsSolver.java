@@ -7,7 +7,7 @@ import java.util.ArrayList;
  */
 public class MaxRectsSolver implements AlgorithmInterface {
     // Set F of free rectangles
-    ArrayList<Rectangle> emptySpaces = new ArrayList<>();
+    ArrayList<Rectangle> emptySpaces;
     // whether rotations are allowed
     boolean rotationsAllowed;
     // whether height is fixed
@@ -33,6 +33,8 @@ public class MaxRectsSolver implements AlgorithmInterface {
     
     @Override
     public PackingSolution solve(PackingProblem pp){
+        emptySpaces = new ArrayList<>();
+        
         // set the rectangles
         rs = pp.getRectangles();
         orderedRectangles = new Rectangle[rs.length];

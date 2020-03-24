@@ -9,7 +9,7 @@ import java.util.Comparator;
  */
 public class GlobalMaxRectsSolver1 implements AlgorithmInterface {
     // Set F of free rectangles
-    ArrayList<Rectangle> emptySpaces = new ArrayList<>();
+    ArrayList<Rectangle> emptySpaces;
     // whether rotations are allowed
     boolean rotationsAllowed;
     // whether height is fixed
@@ -24,6 +24,8 @@ public class GlobalMaxRectsSolver1 implements AlgorithmInterface {
     @Override
     public PackingSolution solve(PackingProblem pp){
         pp.reset();
+        
+        emptySpaces = new ArrayList<>();
         
         // set the rectangles
         rs = pp.getRectangles();

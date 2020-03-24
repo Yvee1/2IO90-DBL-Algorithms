@@ -25,7 +25,7 @@ public class CompoundSolver implements AlgorithmInterface {
         ArrayList<AlgorithmInterface> solvers = new ArrayList<>();
         solvers.add(new BestFitFast());
         solvers.add(new SteinbergSolver());
-//        solvers.add(new GlobalMaxRectsSolver());
+        solvers.add(new GlobalMaxRectsSolver());
 //        solvers.add(new GlobalMaxRectsSolver1());
 //        solvers.add(new GlobalMaxRectsSolver2());
         
@@ -42,7 +42,7 @@ public class CompoundSolver implements AlgorithmInterface {
                 }
             }
         } else {
-//            solvers.add(new MaxRectsSolver(new BSSF(), new DESCSS()));
+            solvers.add(new MaxRectsSolver(new BSSF(), new DESCSS()));
         }
         
         if (((p.rectangles.length <= 25 && p.largestHeight < 3500 
