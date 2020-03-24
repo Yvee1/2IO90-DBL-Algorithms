@@ -45,4 +45,16 @@ public class PackingSolution {
         
         return (double) usedArea / area();
     }
+    
+    public boolean hasOverlap(){
+        boolean hasOverlap = false;
+        for (Rectangle r1 : problem.rectangles){
+            for (Rectangle r2 : problem.rectangles){
+                if (r1 == r2){ continue; }
+                hasOverlap = Rectangle.overlaps(r1, r2) || hasOverlap;
+            }
+        }
+        
+        return hasOverlap;
+    }
 }

@@ -23,10 +23,12 @@ public class CompoundSolver implements AlgorithmInterface {
         
         // Array of solvers to use in order of non-increasing running-time
         ArrayList<AlgorithmInterface> solvers = new ArrayList<>();
-        solvers.add(new BestFitFast());
+        if (p.getSettings().fixed){
+            solvers.add(new BestFitFast());
+        }
         solvers.add(new SteinbergSolver());
         solvers.add(new GlobalMaxRectsSolver());
-//        solvers.add(new GlobalMaxRectsSolver1());
+        solvers.add(new GlobalMaxRectsSolver1());
 //        solvers.add(new GlobalMaxRectsSolver2());
         
         if (p.rectangles.length <= 25){
@@ -42,7 +44,7 @@ public class CompoundSolver implements AlgorithmInterface {
                 }
             }
         } else {
-            solvers.add(new MaxRectsSolver(new BSSF(), new DESCSS()));
+//            solvers.add(new MaxRectsSolver(new BSSF(), new DESCSS()));
         }
         
         if (((p.rectangles.length <= 25 && p.largestHeight < 3500 
@@ -99,7 +101,7 @@ public class CompoundSolver implements AlgorithmInterface {
                 System.out.println(secondsUsed);
             }
 
-            if (bestSolution == null || sol.area() < bestSolution.area()){
+            if (bestSolution == null || sol.area() < bestSolution.area() && !bestSolution.hasOverlap()){
                 bestSolution = sol;
                 bestSolver = solverName;
                 useAlt = !useAlt;
