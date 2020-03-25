@@ -25,6 +25,13 @@ public class PackingSettings {
         this(fixed, rotation, n);
         this.maxHeight = maxHeight;
     }
+    
+    public PackingSettings(PackingSettings pp){
+        fixed = pp.fixed;
+        rotation = pp.rotation;
+        n = pp.n;
+        maxHeight = pp.maxHeight;
+    }
 
     public boolean getFixed() { return this.fixed; }
     public void setFixed(boolean fixed) { this.fixed = fixed; }
