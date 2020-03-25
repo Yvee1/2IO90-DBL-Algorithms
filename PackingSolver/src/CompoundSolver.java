@@ -1,10 +1,8 @@
 
 import java.util.ArrayList;
-import java.util.Arrays;
-
 /**
  *
- * @author Steven van den Broek
+ * @author Steven van den Broek and Pim van Leeuwen 
  */
 public class CompoundSolver implements AlgorithmInterface {
     boolean debug;
@@ -17,15 +15,17 @@ public class CompoundSolver implements AlgorithmInterface {
         this.debug = debug;
     }
     
+    PackingSolution sol;
+    
     @Override
     public PackingSolution solve(PackingProblem p){
-        long bigBang = System.currentTimeMillis();
         
         // Array of solvers to use in order of non-increasing running-time
         ArrayList<AlgorithmInterface> solvers = new ArrayList<>();
         if (p.getSettings().fixed){
             solvers.add(new BestFitFast());
         }
+        
         solvers.add(new SteinbergSolver());
         solvers.add(new GlobalMaxRectsSolver());
         solvers.add(new GlobalMaxRectsSolver1());
@@ -63,28 +63,25 @@ public class CompoundSolver implements AlgorithmInterface {
         PackingSolution bestSolution = null;
         String bestSolver = null;
         
-        PackingProblem altP = new PackingProblem(p);
-        // seconds used for previous algorithm
-        double secondsUsed = 0;
-        // seconds left till total time reaches 30
-        double secondsLeft = 30 - (System.currentTimeMillis() - bigBang) / 1000;
+//        PackingProblem altP = new PackingProblem(p);
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + 20000;
 
-        boolean useAlt = true;
-//        for (int i = 0; i < solvers.size() && secondsLeft > secondsUsed; i++){
-        for (int i = 0; i < solvers.size(); i++){
-            long startTime = System.currentTimeMillis();
-            PackingSolution sol;
-            if (useAlt){
-                sol = solvers.get(i).solve(altP);
-            } else {
-                sol = solvers.get(i).solve(p);
-            }
-            long endTime = System.currentTimeMillis();
-            long time = endTime - startTime;
+//        boolean useAlt = true;
+        System.err.print(p.rectangles.length);
+        for (int i = 0; i < solvers.size() && System.currentTimeMillis() < endTime; i++){  
+            try {
+                sol = solvers.get(i).solve(new PackingProblem(p));
+            } catch (InterruptedException e) {
+                System.err.print(e);
+                continue;
+            }         
 
-            secondsUsed = (double) time / 1000;
-            secondsLeft = 30 - secondsUsed;
             
+            long time = endTime - startTime;
+            
+            double secondsUsed = (double) time / 1000;
+                 
             String solverName = solvers.get(i).getClass().getName();
             if (solverName.equals("MaxRectsSolver")){
                 MaxRectsSolver solver = (MaxRectsSolver) solvers.get(i);
@@ -105,8 +102,10 @@ public class CompoundSolver implements AlgorithmInterface {
             if (bestSolution == null || sol.area() < bestSolution.area()){
                 bestSolution = sol;
                 bestSolver = solverName;
-                useAlt = !useAlt;
+//                useAlt = !useAlt;
             }
+            
+
         }
         
         if (debug){
@@ -117,4 +116,5 @@ public class CompoundSolver implements AlgorithmInterface {
         
         return bestSolution;
     }
+    
 }

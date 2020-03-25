@@ -26,8 +26,12 @@ public class PackingSolver {
             AlgorithmInterface ai;
 //            ai = new MaxRectsSolver(new BSSF(), new DESCSS());
             ai = new GlobalMaxRectsSolver();
-        
-            solution = ai.solve(p);
+            try {
+                solution = ai.solve(p);
+            } catch (InterruptedException e) {
+                solution = null;
+            }
+            
         }
 
         // Verify the solutios validity

@@ -22,8 +22,10 @@ public class GlobalMaxRectsSolver1 implements AlgorithmInterface {
     boolean debug = false;
     
     @Override
-    public PackingSolution solve(PackingProblem pp){
+    public PackingSolution solve(PackingProblem pp) throws InterruptedException{
         pp.reset();
+        
+        double endTime = System.currentTimeMillis() + 7000;
         
         emptySpaces = new ArrayList<>();
         
@@ -46,6 +48,10 @@ public class GlobalMaxRectsSolver1 implements AlgorithmInterface {
         emptySpaces.add(container);
 
         for (int i = 0; i < rs.length; i++){
+            if (System.currentTimeMillis() > endTime) {
+                pp.reset();
+                throw new InterruptedException("GMRS1");
+            }
 
             boolean fit = false;
             boolean shouldBeRotated = false;

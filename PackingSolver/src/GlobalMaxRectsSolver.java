@@ -26,8 +26,11 @@ public class GlobalMaxRectsSolver implements AlgorithmInterface {
     boolean debug = false;
     
     @Override
-    public PackingSolution solve(PackingProblem pp){
+    public PackingSolution solve(PackingProblem pp) throws InterruptedException{
         pp.reset();
+        
+        //added by Pim
+        double endTime = System.currentTimeMillis() + 7000;
         
         emptySpaces  = new ArrayList<>();
         n = 0;
@@ -54,7 +57,10 @@ public class GlobalMaxRectsSolver implements AlgorithmInterface {
 
         // iterate as many times as there are rectangles
         for (int i = 0; i < rs.length; i++){
-
+            if (System.currentTimeMillis() > endTime) {
+                pp.reset();
+                throw new InterruptedException("GMRS");
+            }
             boolean fit = false;
             boolean shouldBeRotated = false;
             

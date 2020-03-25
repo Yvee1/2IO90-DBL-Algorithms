@@ -25,7 +25,7 @@ public class SolverTester {
     public SolverTester(AlgorithmInterface ai) {
         algorithm = ai;
         printer = new OutputPrinter();
-        testCasesPath = new File("").getAbsolutePath() + "\\Testcases\\";
+        testCasesPath = "D:\\2IO90-DBL-Algorithms\\Testcases\\";
         testCases = new ArrayList<>();
     }
 
@@ -179,7 +179,12 @@ public class SolverTester {
         }
 
         public void run() {
-            solution = algo.solve(problem);
+            try {
+                solution = algo.solve(problem);
+            } catch (InterruptedException e) {
+                
+            }
+            
             density = calculateDensity(solution);
         }
 
