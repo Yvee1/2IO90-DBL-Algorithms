@@ -125,9 +125,9 @@ public class GlobalMaxRectsSolver2 implements AlgorithmInterface {
                 }
                 
                 // rotate if it doesn't fit in container otherwise
-                if (fixed && r.getHeight() > container.getHeight()){
+                if (fixed && r.getHeight() > container.getHeight() && rotationsAllowed){
                     r.rotate();
-                } else if (fixed && r.getWidth() > r.getHeight() && r.getWidth() <= container.getHeight()){
+                } else if (fixed && r.getWidth() > r.getHeight() && r.getWidth() <= container.getHeight() && rotationsAllowed){
                     // rotate the rectangle upright if it fits that way
                     r.rotate();
                 }

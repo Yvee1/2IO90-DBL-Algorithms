@@ -101,7 +101,8 @@ public class CompoundSolver implements AlgorithmInterface {
                 System.out.println(secondsUsed);
             }
 
-            if (bestSolution == null || sol.area() < bestSolution.area() && !bestSolution.hasOverlap()){
+//            if (bestSolution == null || sol.area() < bestSolution.area() && !bestSolution.hasOverlap()){
+            if (bestSolution == null || sol.area() < bestSolution.area()){
                 bestSolution = sol;
                 bestSolver = solverName;
                 useAlt = !useAlt;
