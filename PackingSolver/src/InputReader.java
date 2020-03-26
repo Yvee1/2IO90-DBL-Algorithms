@@ -70,6 +70,8 @@ public class InputReader {
             r[i] = new Rectangle(width, height);
             r[i].id = i;
 
+            if (r[i].h > settings.maxHeight) { r[i].rotate(); }
+
             if (width > largestWidth) { largestWidth = width; }
             if (height > largestHeight) { largestHeight = height; }
         }
