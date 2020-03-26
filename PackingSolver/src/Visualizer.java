@@ -269,7 +269,7 @@ public class Visualizer extends JPanel  {
                     };
                     new Timer((int) 1000.0 / 60, taskPerformer).start();
                 }
-                frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
                 frame.setVisible(true);
             }
         });
