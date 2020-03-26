@@ -8,19 +8,19 @@ public class DownScaleSolver implements AlgorithmInterface {
     private final int maxLength = 10;
     
     @Override
-    public PackingSolution solve(PackingProblem p){
+    public PackingSolution solve(PackingProblem p) throws InterruptedException {
         int largestSide = Math.max(p.getLargestHeight(), p.getLargestWidth());
         double scale = (double) maxLength / largestSide;
         System.out.format("Scale %f\n", scale);
         
         PackingProblem smallP = downScale(p, scale);
         AlgorithmInterface brute = new BruteForceSolver();
-        try {
-        brute.solve(smallP);
-        } catch (InterruptedException e) {
-            System.err.print(e);
+
+        PackingSolution smallSol = brute.solve(smallP);
+
+        for (Rectangle r: smallSol.problem.rectangles){
+            ((DownScaledRectangle) r).original.setPos((int) (r.getX() / scale), (int) (r.getY() / scale));
         }
-        
         
         return new PackingSolution(p);
     }
@@ -37,7 +37,7 @@ public class DownScaleSolver implements AlgorithmInterface {
         Rectangle[] downScaledRs = new Rectangle[rs.length];
         
         for (int i = 0; i < rs.length; i++){
-            downScaledRs[i] = downScale(rs[i].clone(), scale);
+            downScaledRs[i] = new DownScaledRectangle(rs[i], scale);
             System.out.println(downScaledRs[i]);
         }
         
@@ -53,17 +53,37 @@ public class DownScaleSolver implements AlgorithmInterface {
         return new PackingProblem(ps, downScaledRs);
     }
     
-    /**
-     * Down scale rectangle, rounding up
-     * @param r Rectangle to scale
-     * @param scale The scale to use
-     * @modifies r
-     */
-    private Rectangle downScale(Rectangle r, double scale){
-        r.setWidth((int) Math.ceil(r.getWidth() * scale));
-        r.setHeight((int) Math.ceil(r.getHeight() * scale));
-        return r;
-    }
     
+    class DownScaledRectangle extends Rectangle {
+        // reference to the original rectangle
+        Rectangle original;
+        
+        DownScaledRectangle(DownScaledRectangle r){
+            super(r);
+            original = r.original;
+        }
+        
+        DownScaledRectangle(Rectangle r, double scale){
+            super(r);
+            original = r;
+            downScale(scale);
+        }
+        
+        /**
+        * Down scale rectangle, rounding up
+        * @param scale The scale to use
+        * @modifies this
+        */
+       private DownScaledRectangle downScale(double scale){
+           setWidth((int) Math.ceil(getWidth() * scale));
+           setHeight((int) Math.ceil(getHeight() * scale));
+           return this;
+       }
+       
+       @Override
+       public DownScaledRectangle clone(){
+           return new DownScaledRectangle(this);
+       }
+    }
     
 }

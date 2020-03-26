@@ -537,7 +537,7 @@ class BruteForceSolver implements AlgorithmInterface {
      */
     private void copyInto(Rectangle[] r1, Rectangle[] r2) {
         for (int i = 0; i < r1.length; i++) {
-            r2[i] = new Rectangle(r1[i]);
+            r2[i] = r1[i].clone();
         }
     }
 

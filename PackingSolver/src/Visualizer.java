@@ -61,7 +61,7 @@ public class Visualizer extends JPanel  {
     // currently when multiple windows are open they start synchronously,
     // this is intended but can be changed by making the started variable non-static.
     private static boolean started = false;
-    private final boolean animate = true;
+    private final boolean animate = false;
     private final double animationDuration = 5.0;
     
     private final boolean saveAnimation = false;
