@@ -6,7 +6,7 @@ public class SolverTester {
 
     // STOP JE SOLVER IN MAIN()
     // VUL HIER IN WELKE TEST CASES
-    private String cases = "ConsecutiveSquares";
+    private String cases = "crash_steinberg.txt";
     // Open visualizer als overlap of height limit exceeded is?
     private boolean visualizeOnInvalidSolution = true;
     // e.g. "" leeg voor alle test cases
@@ -25,7 +25,7 @@ public class SolverTester {
     public SolverTester(AlgorithmInterface ai) {
         algorithm = ai;
         printer = new OutputPrinter();
-        testCasesPath = "D:\\2IO90-DBL-Algorithms\\Testcases\\";
+        testCasesPath = "C:\\Users\\Vincent\\Documents\\__git\\2IO90-DBL-Algorithms\\Testcases\\";
         testCases = new ArrayList<>();
     }
 
@@ -78,8 +78,8 @@ public class SolverTester {
         System.out.println("Visualize the following case (enter to skip or e.g.'35'):");
         String input = sc.next().trim();
         while (input.length() != 0) {
-            System.out.println("Visualising " + testCases.get(Integer.parseInt(input)).getPath());
-            Visualizer.visualize(testCases.get(Integer.parseInt(input)).getSolution(), false, true);
+            System.out.println("Visualising " + testCases.get(Integer.parseInt(input) - 1).getPath());
+            Visualizer.visualize(testCases.get(Integer.parseInt(input) - 1).getSolution(), false, true);
             System.out.println("Visualize the following case (enter to skip or e.g.'35'):");
             input = sc.next().trim();
         }

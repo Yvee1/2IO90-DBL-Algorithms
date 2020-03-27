@@ -50,6 +50,14 @@ public class SteinbergSolver implements AlgorithmInterface {
             rectangles.get(i).toRectangle();
         }
 
+        int fuck = 0;
+        for (Rectangle r : p.getRectangles()) {
+            if (r.getX() < 0) {
+                r.setPos((int) (boundingBox.getWidth() + fuck), 0);
+                fuck += r.getWidth();
+            }
+        }
+
         // "shake" the boundingbox to make more compact solution
         shake(p);
 
