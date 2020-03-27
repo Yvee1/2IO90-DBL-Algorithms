@@ -22,6 +22,12 @@ public class CompoundSolver implements AlgorithmInterface {
         
         // Array of solvers to use in order of non-increasing running-time
         ArrayList<AlgorithmInterface> solvers = new ArrayList<>();
+
+        /* Run the DownScaleSolver when possible. */
+        if (p.rectangles.length <= 25) {
+            solvers.add(new DownScaleSolver());
+        }
+
         if (p.getSettings().fixed){
             solvers.add(new BestFitFast());
         }
@@ -47,14 +53,14 @@ public class CompoundSolver implements AlgorithmInterface {
 //            solvers.add(new MaxRectsSolver(new BSSF(), new DESCSS()));
         }
         
-        if (((p.rectangles.length <= 25 && p.largestHeight < 3500 
-                && p.largestWidth < 3500) || (p.rectangles.length <= 10 
-                && p.largestHeight < 5300 && p.largestWidth < 5300) 
-                || (p.rectangles.length <= 4 && p.largestHeight < 8000 
-                && p.largestWidth < 8000)) && !p.getSettings().rotation) {
-               
-            solvers.add(0, new BruteForceSolver());
-        }
+//        if (((p.rectangles.length <= 25 && p.largestHeight < 3500
+//                && p.largestWidth < 3500) || (p.rectangles.length <= 10
+//                && p.largestHeight < 5300 && p.largestWidth < 5300)
+//                || (p.rectangles.length <= 4 && p.largestHeight < 8000
+//                && p.largestWidth < 8000)) && !p.getSettings().rotation) {
+//
+//            solvers.add(0, new BruteForceSolver());
+//        }
         
         if (!p.getSettings().fixed){
             solvers.add(new BasicBinPacking());

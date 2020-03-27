@@ -10,8 +10,10 @@ public class DownScaleSolver implements AlgorithmInterface {
     @Override
     public PackingSolution solve(PackingProblem p) throws InterruptedException {
         int largestSide = Math.max(p.getLargestHeight(), p.getLargestWidth());
-        double scale = (double) maxLength / largestSide;
-        System.out.format("Scale %f\n", scale);
+
+        double scale = Math.min((double) maxLength / largestSide, 1.0);
+
+        //System.out.format("Scale %f\n", scale);
         
         PackingProblem smallP = downScale(p, scale);
         AlgorithmInterface brute = new BruteForceSolver();
@@ -38,7 +40,7 @@ public class DownScaleSolver implements AlgorithmInterface {
         
         for (int i = 0; i < rs.length; i++){
             downScaledRs[i] = new DownScaledRectangle(rs[i], scale);
-            System.out.println(downScaledRs[i]);
+            //System.out.println(downScaledRs[i]);
         }
         
         // Copy settings
@@ -47,7 +49,7 @@ public class DownScaleSolver implements AlgorithmInterface {
         // Downscale max height, *rounds down*
         if(ps.fixed){
             ps.setMaxHeight((int) (p.settings.maxHeight * scale));
-            System.out.format("Height limit: %d\n", ps.getMaxHeight());
+            //System.out.format("Height limit: %d\n", ps.getMaxHeight());
         }
         
         return new PackingProblem(ps, downScaledRs);
