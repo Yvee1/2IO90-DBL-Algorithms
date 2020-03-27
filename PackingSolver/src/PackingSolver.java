@@ -11,7 +11,7 @@ public class PackingSolver {
      */
     static void run() {
         boolean multipleSolvers = false;
-        boolean debug = true;
+        boolean debug = false;
 
         // Read the problem from input
         InputReader reader = new InputReader();
@@ -25,7 +25,7 @@ public class PackingSolver {
             // Decide which algorithm to apply
             AlgorithmInterface ai;
 //            ai = new MaxRectsSolver(new BSSF(), new DESCSS());
-            ai = new DownScaleSolver();
+            ai = new SteinbergSolver();
             try {
                 solution = ai.solve(p);
             } catch (InterruptedException e) {

@@ -253,14 +253,14 @@ public class SteinbergSolver implements AlgorithmInterface {
         if (boundingBox.getHeight() % 1 >= 0.9999) {
             boundingBox.setHeight(Math.ceil(boundingBox.getHeight()));
         }
-        list.sort(Comparator.comparing(Rect::getHeight).reversed());
-        if (conditionm1(boundingBox, list)) { procedurem1(boundingBox, list); return;}
-        else if (conditionm2(boundingBox, list)) { procedurem2(boundingBox, list); return;}
-        else if (conditionm3(boundingBox, list)) { procedurem3(boundingBox, list); return;}
         list.sort(Comparator.comparing(Rect::getWidth).reversed());
         if (condition1(boundingBox, list)) { procedure1(boundingBox, list); return;}
         else if (condition2(boundingBox, list)) { procedure2(boundingBox, list); return;}
         else if (condition3(boundingBox, list)) { procedure3(boundingBox, list); return;}
+        list.sort(Comparator.comparing(Rect::getHeight).reversed());
+        if (conditionm1(boundingBox, list)) { procedurem1(boundingBox, list); return;}
+        else if (conditionm2(boundingBox, list)) { procedurem2(boundingBox, list); return;}
+        else if (conditionm3(boundingBox, list)) { procedurem3(boundingBox, list); return;}
         else if (condition0(boundingBox, list)) { procedure0(boundingBox, list); return;}
     }
 
