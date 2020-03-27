@@ -23,14 +23,23 @@ public class GlobalMaxRectsSolver implements AlgorithmInterface {
     // Denotes we are at the nth rectangle
     int n;
     
+    /**
+     * The timeOut time
+     */
+    int timeOut;
+    
     boolean debug = false;
+    
+    public GlobalMaxRectsSolver(int time) {
+        timeOut = 1000*time;
+    }
     
     @Override
     public PackingSolution solve(PackingProblem pp) throws InterruptedException{
         pp.reset();
         
         //added by Pim
-        double endTime = System.currentTimeMillis() + 7000;
+        double endTime = System.currentTimeMillis() + timeOut;
         
         emptySpaces  = new ArrayList<>();
         n = 0;

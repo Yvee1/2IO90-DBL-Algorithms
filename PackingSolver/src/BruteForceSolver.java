@@ -391,13 +391,13 @@ class BruteForceSolver implements AlgorithmInterface {
         
         switch (p.rectangles.length) {
             case 25:
-                runTimeInSec = 12;
+                runTimeInSec = 24; 
                 break;
             case 10:
-                runTimeInSec = 12;
+                runTimeInSec = 24; 
                 break;
             default:
-                runTimeInSec = 24;
+                runTimeInSec = 24; 
                 break;
         }
 

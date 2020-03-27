@@ -21,11 +21,21 @@ public class GlobalMaxRectsSolver1 implements AlgorithmInterface {
     
     boolean debug = false;
     
+    /**
+     * The timeOut time
+     */
+    int timeOut;
+    
+    public GlobalMaxRectsSolver1(int time) {
+        timeOut = 1000*time;
+    }
+    
+    
     @Override
     public PackingSolution solve(PackingProblem pp) throws InterruptedException{
         pp.reset();
         
-        double endTime = System.currentTimeMillis() + 7000;
+        double endTime = System.currentTimeMillis() + timeOut;
         
         emptySpaces = new ArrayList<>();
         
