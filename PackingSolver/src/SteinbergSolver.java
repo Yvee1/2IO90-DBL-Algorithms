@@ -73,7 +73,7 @@ public class SteinbergSolver implements AlgorithmInterface {
      *
      * @param p the packing problem
      */
-    private void shake(PackingProblem p) {
+    public static void shake(PackingProblem p) {
         List<Rectangle> rects = Arrays.asList(p.getRectangles().clone());
         // Get new bounding box after Steinberg ran
         int width = 0;
@@ -126,7 +126,7 @@ public class SteinbergSolver implements AlgorithmInterface {
      * @param width the width of the current solution
      * @param height the height to which to pull the rectangles
      */
-    private void pullUp(List<Rectangle> list, int width, int height) {
+    private static void pullUp(List<Rectangle> list, int width, int height) {
         list.sort(Comparator.comparing(Rectangle::getVerticalReach).reversed());
         int[] markers = new int[width];
         for (int i = 0; i < width; i++) { markers[i] = height; }
@@ -142,7 +142,7 @@ public class SteinbergSolver implements AlgorithmInterface {
      * @param markers the markers, indicating collision box
      * @param height the height of the current solution
      */
-    private void up(Rectangle r, int[] markers, int height) {
+    private static void up(Rectangle r, int[] markers, int height) {
         int left = r.getX();
         int right = left + r.getWidth();
         int mark = height;
@@ -162,7 +162,7 @@ public class SteinbergSolver implements AlgorithmInterface {
      * @param width the width of the current solution
      * @param height the height of the current solution
      */
-    private void leftDown(List<Rectangle> list, int width, int height) {
+    private static void leftDown(List<Rectangle> list, int width, int height) {
         pullLeft(list, height);
         pullDown(list, width);
     }
@@ -173,7 +173,7 @@ public class SteinbergSolver implements AlgorithmInterface {
      * @param list the list of rectangles to be moved
      * @param width the width of the current solution
      */
-    private void pullDown(List<Rectangle> list, int width) {
+    private static void pullDown(List<Rectangle> list, int width) {
         list.sort(Comparator.comparing(Rectangle::getY));
         int[] markers = new int[width];
         for (int i = 0; i < width; i++) { markers[i] = 0; }
@@ -188,7 +188,7 @@ public class SteinbergSolver implements AlgorithmInterface {
      * @param r the rectangle to move
      * @param markers the markers, indicating collision boxes
      */
-    private void down(Rectangle r, int[] markers) {
+    private static void down(Rectangle r, int[] markers) {
         int left = r.getX();
         int right = left + r.getWidth();
         int mark = 0;
@@ -207,7 +207,7 @@ public class SteinbergSolver implements AlgorithmInterface {
      * @param list the list of rectangles to move
      * @param height the height of the current solution
      */
-    private void pullLeft(List<Rectangle> list, int height) {
+    private static void pullLeft(List<Rectangle> list, int height) {
         list.sort(Comparator.comparing(Rectangle::getX));
         int[] markers = new int[height];
         for (int i = 0; i < height; i++) { markers[i] = 0; }
@@ -222,7 +222,7 @@ public class SteinbergSolver implements AlgorithmInterface {
      * @param r the rectangle to move
      * @param markers markers indicating collision boxes
      */
-    private void left(Rectangle r, int[] markers) {
+    private static void left(Rectangle r, int[] markers) {
         int bottom = r.getY();
         int top = bottom + r.getHeight();
         int mark = 0;

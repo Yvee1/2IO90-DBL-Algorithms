@@ -24,6 +24,8 @@ public class PackingProblem {
         
         this.settings = p.settings;
         this.rectangles = rs;
+        this.largestWidth = p.largestWidth;
+        this.largestHeight = p.largestHeight;
     }
 
     public PackingSettings getSettings() { return this.settings; }

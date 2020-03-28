@@ -5,12 +5,12 @@
 
 public class DownScaleSolver implements AlgorithmInterface {
     // Downscale such that all sides have height and width <= maxLength
-    private final int maxLength = 10;
+    private final int maxLength = 15;
     
     @Override
     public PackingSolution solve(PackingProblem p) throws InterruptedException {
         int largestSide = Math.max(p.getLargestHeight(), p.getLargestWidth());
-
+        
         double scale = Math.min((double) maxLength / largestSide, 1.0);
 
         //System.out.format("Scale %f\n", scale);
@@ -24,6 +24,7 @@ public class DownScaleSolver implements AlgorithmInterface {
             ((DownScaledRectangle) r).original.setPos((int) (r.getX() / scale), (int) (r.getY() / scale));
         }
         
+        SteinbergSolver.shake(p);
         return new PackingSolution(p);
     }
     

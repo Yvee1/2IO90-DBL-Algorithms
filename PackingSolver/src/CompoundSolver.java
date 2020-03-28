@@ -29,9 +29,9 @@ public class CompoundSolver implements AlgorithmInterface {
         ArrayList<AlgorithmInterface> solvers = new ArrayList<>();
 
         /* Run the DownScaleSolver when possible. */
-//        if (p.rectangles.length <= 25) {
-//            solvers.add(new DownScaleSolver());
-//        }
+        if (p.rectangles.length <= 25) {
+            solvers.add(new DownScaleSolver());
+        }
 
         if (p.getSettings().fixed){
             solvers.add(new BestFitFast());
