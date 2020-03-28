@@ -24,6 +24,11 @@ public class CompoundSolver implements AlgorithmInterface {
         String bestSolver = null;
         
         bestSolution = new SteinbergSolver().solve(new PackingProblem(p));
+        bestSolver = "SteinbergSolver";
+        System.out.println();
+        System.out.println(bestSolver);
+        System.out.print("Area: ");
+        System.out.println(bestSolution.area());
         
         // Array of solvers to use in order of non-increasing running-time
         ArrayList<AlgorithmInterface> solvers = new ArrayList<>();
@@ -78,15 +83,16 @@ public class CompoundSolver implements AlgorithmInterface {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + 20000;       
         
-        for (int i = 0; i < solvers.size() && System.currentTimeMillis() < endTime; i++){  
+        for (int i = 0; i < solvers.size() && System.currentTimeMillis() < endTime; i++){
+            long solverStartTime = System.currentTimeMillis();
             try {
                 sol = solvers.get(i).solve(new PackingProblem(p));
             } catch (InterruptedException e) {
                 System.err.print(solvers.get(i));
                 continue;
             }         
-            
-            long time = endTime - startTime;
+            long solverEndTime = System.currentTimeMillis();
+            long time = solverEndTime - solverStartTime;
             
             double secondsUsed = (double) time / 1000;
                  
