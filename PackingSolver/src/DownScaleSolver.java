@@ -13,6 +13,13 @@ public class DownScaleSolver implements AlgorithmInterface {
         
         double scale = Math.min((double) maxLength / largestSide, 1.0);
 
+        /* With these conditions, ordinary brute-force can be ran. */
+        if ((p.largestHeight < 3500 && p.largestWidth < 3500) ||
+                (p.rectangles.length <= 10 && p.largestHeight < 5300 && p.largestWidth < 5300) ||
+                (p.rectangles.length <= 4 && p.largestHeight < 8000 && p.largestWidth < 8000)) {
+            scale = 1.0;
+        }
+
         //System.out.format("Scale %f\n", scale);
         
         PackingProblem smallP = downScale(p, scale);
