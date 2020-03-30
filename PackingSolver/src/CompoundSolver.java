@@ -22,13 +22,16 @@ public class CompoundSolver implements AlgorithmInterface {
         
         PackingSolution bestSolution = null;
         String bestSolver = null;
-        
+
+
         bestSolution = new SteinbergSolver().solve(new PackingProblem(p));
         bestSolver = "SteinbergSolver";
-        System.out.println();
-        System.out.println(bestSolver);
-        System.out.print("Area: ");
-        System.out.println(bestSolution.area());
+        if (debug) {
+            System.out.println();
+            System.out.println(bestSolver);
+            System.out.print("Area: ");
+            System.out.println(bestSolution.area());
+        }
         
         // Array of solvers to use in order of non-increasing running-time
         ArrayList<AlgorithmInterface> solvers = new ArrayList<>();

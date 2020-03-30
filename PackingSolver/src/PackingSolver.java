@@ -11,7 +11,7 @@ public class PackingSolver {
      */
     static void run() {
         boolean multipleSolvers = true;
-        boolean debug = true;
+        boolean debug = false;
 
         // Read the problem from input
         InputReader reader = new InputReader();
