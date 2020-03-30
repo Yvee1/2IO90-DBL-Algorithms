@@ -5,31 +5,44 @@
 
 public class DownScaleSolver implements AlgorithmInterface {
     // Downscale such that all sides have height and width <= maxLength
-    private final int maxMaxLength = 16;
     private final AlgorithmInterface brute = new BruteForceSolver();
     private int largestSide;
+    
+    // last down scaled fixed height calculated
+    private int downScaledFixedHeight = -1;
     
     // original packing problem
     private PackingProblem p;
     
     private boolean debug = false;
     
+    // may run up to 25 seconds
+    private int maxRunTime = 25;
+    private long endTime;
+    
     DownScaleSolver(){}
     DownScaleSolver(boolean debug){ this.debug = debug; }
     
     @Override
     public PackingSolution solve(PackingProblem p) throws InterruptedException {
+        if (p.rectangles.length > 25){
+            return new PackingSolution(p);
+        }
+                
+        endTime = System.currentTimeMillis() + maxRunTime * 1000;
+        
         this.p = p;
         largestSide = Math.max(p.getLargestHeight(), p.getLargestWidth());
+//        largestSide = Math.min(Math.max(p.getLargestHeight(), p.getLargestWidth()), p.settings.maxHeight);
         
         /* With these conditions, ordinary brute-force can be ran. */
-        if ((p.largestHeight < 35 && p.largestWidth < 35) ||
+        if (!p.settings.rotation && (p.largestHeight < 35 && p.largestWidth < 35) ||
                 (p.rectangles.length <= 10 && p.largestHeight < 53 && p.largestWidth < 53) ||
                 (p.rectangles.length <= 4 && p.largestHeight < 80 && p.largestWidth < 80)) {
             return brute.solve(p);
         }
         
-        if (p.rectangles.length <= 6){
+        if (p.rectangles.length <= 6 && p.settings.rotation){
             return runWithRotations(15);
         } else {
             return runWithDifferentMaxLengths();
@@ -61,7 +74,7 @@ public class DownScaleSolver implements AlgorithmInterface {
                 continue;
             }
             
-            PackingSolution sol = run(newP, maxLength);
+            PackingSolution sol = run(newP, maxLength, maxRunTime);
             
             if (debug){
                 System.out.format("Rotation %s: %d\n", switches, sol.area());
@@ -84,10 +97,12 @@ public class DownScaleSolver implements AlgorithmInterface {
     private PackingSolution runWithDifferentMaxLengths() throws InterruptedException {
         PackingSolution bestSolution = null;
         int bestMaxLength = -1;
+
+        long timeLeft = maxRunTime;
         
-        for (int maxLength = 2; maxLength <= maxMaxLength; maxLength++){
-            PackingSolution sol = run(new PackingProblem(p), maxLength);
-            
+        for (int maxLength = 2; timeLeft > 0; maxLength++, timeLeft = endTime - System.currentTimeMillis()){
+            PackingSolution sol = run(new PackingProblem(p), maxLength, timeLeft);
+                     
             if (debug){
                 System.out.format("maxLength %d: %d\n", maxLength, sol.area());
             }
@@ -106,7 +121,7 @@ public class DownScaleSolver implements AlgorithmInterface {
         return bestSolution;
     }
     
-    private PackingSolution run(PackingProblem p, int maxLength) throws InterruptedException {
+    private PackingSolution run(PackingProblem p, int maxLength, long timeLeft) throws InterruptedException {
         Fraction scale = new Fraction(maxLength, largestSide);
 
         /* If the scale is > 1, set it to 1. */
@@ -115,7 +130,7 @@ public class DownScaleSolver implements AlgorithmInterface {
         }
         
         PackingProblem smallP = downScale(p, scale);
-        PackingSolution smallSol = brute.solve(smallP);
+        PackingSolution smallSol = new BruteForceSolver((int) (timeLeft / 1000)).solve(smallP);
 
         /* Invert the scale, to scale back up. */
         Fraction inv_scale = scale.inverse();
@@ -148,13 +163,16 @@ public class DownScaleSolver implements AlgorithmInterface {
         // Downscale max height, *rounds down*
         if(ps.fixed){
             int scaledMax = Fraction.mul_floor(scale, p.settings.maxHeight);
+            downScaledFixedHeight = scaledMax;
             ps.setMaxHeight(scaledMax);
-            //System.out.format("Height limit: %d\n", ps.getMaxHeight());
+//            System.out.format("Height limit: %d\n", ps.getMaxHeight());
+        } else {
+            downScaledFixedHeight = Integer.MAX_VALUE;
         }
 
         for (int i = 0; i < rs.length; i++){
             downScaledRs[i] = new DownScaledRectangle(rs[i], scale);
-            //System.out.println(downScaledRs[i]);
+//            System.out.println(downScaledRs[i]);
         }
         
         return new PackingProblem(ps, downScaledRs);
@@ -189,13 +207,13 @@ public class DownScaleSolver implements AlgorithmInterface {
         */
        private DownScaledRectangle downScale(double scale){
            setWidth((int) Math.ceil(getWidth() * scale));
-           setHeight((int) Math.ceil(getHeight() * scale));
+           setHeight(Math.min((int) Math.ceil(getHeight() * scale), downScaledFixedHeight));
            return this;
        }
 
         private DownScaledRectangle downScale(Fraction scale){
             setWidth(Fraction.mul_ceil(scale, getWidth()));
-            setHeight(Fraction.mul_ceil(scale, getHeight()));
+            setHeight(Math.min(Fraction.mul_ceil(scale, getHeight()), downScaledFixedHeight));
             return this;
         }
        
@@ -277,4 +295,7 @@ class Fraction {
         return p;
     }
 
+    public String toString(){
+        return String.format("%d / %d", numerator, denominator);
+    }
 }

@@ -86,13 +86,17 @@ class BruteForceSolver implements AlgorithmInterface {
      */
     private long endTimeInMilSec;
 
+    
+    BruteForceSolver(){ runTimeInSec = 24; }
+    BruteForceSolver(int runTimeInSec){ this.runTimeInSec = runTimeInSec; }
+    
     /**
      * Gets the optimal solution for an array of rectangles
      */
     @Override
     public PackingSolution solve(PackingProblem p) {
         boolean done = false;
-        
+
         setVariables(p);
         
         fitRectangles();
@@ -393,17 +397,17 @@ class BruteForceSolver implements AlgorithmInterface {
         
         this.p = p;
         
-        switch (p.rectangles.length) {
-            case 25:
-                runTimeInSec = 24; 
-                break;
-            case 10:
-                runTimeInSec = 24; 
-                break;
-            default:
-                runTimeInSec = 24; 
-                break;
-        }
+//        switch (p.rectangles.length) {
+//            case 25:
+//                runTimeInSec = 24; 
+//                break;
+//            case 10:
+//                runTimeInSec = 24; 
+//                break;
+//            default:
+//                runTimeInSec = 24; 
+//                break;
+//        }
 
 
     }

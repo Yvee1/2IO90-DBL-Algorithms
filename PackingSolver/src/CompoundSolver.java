@@ -19,7 +19,6 @@ public class CompoundSolver implements AlgorithmInterface {
     
     @Override
     public PackingSolution solve(PackingProblem p){
-        
         PackingSolution bestSolution = null;
         String bestSolver = null;
 
