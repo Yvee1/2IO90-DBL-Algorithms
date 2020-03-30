@@ -136,7 +136,9 @@ class BruteForceSolver implements AlgorithmInterface {
     private void iteration() throws InterruptedException{
         for (int w = finalWidth; w >= maxRectangleWidth; w--) {
             maxWidth = w;
+            //System.out.println(w);
             while(solution.width*solution.height > w*containerHeight) {
+                //System.out.println(w);
                 if (doRectanglesFit(w, containerHeight)) {
                     copyInto(rectangles, rect);
                     solution = new PackingSolution(p, w, containerHeight);
@@ -178,12 +180,14 @@ class BruteForceSolver implements AlgorithmInterface {
             throw new InterruptedException();
         }
         //System.out.println(i);
+        //System.out.println(solutionArray.length);
+        //System.out.println(solutionArray[0].length);
         if (i == rectangles.length) {            
             return true;
         }
-        int totalArea = solutionArray.length * solutionArray[0].length;
-        verBinArray = new int[(int) Math.ceil(totalArea / 2.0)];
-        horBinArray = new int[(int) Math.ceil(totalArea / 2.0)];
+        //int totalArea = solutionArray.length * solutionArray[0].length;
+        verBinArray = new int[(int) (Math.ceil(solutionArray[0].length / 2.0) * solutionArray.length) ];
+        horBinArray = new int[(int) (Math.ceil(solutionArray.length / 2.0) * solutionArray[0].length)];
         /**
          * Create vertical bins
          */
