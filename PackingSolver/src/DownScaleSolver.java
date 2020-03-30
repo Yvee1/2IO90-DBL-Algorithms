@@ -5,33 +5,116 @@
 
 public class DownScaleSolver implements AlgorithmInterface {
     // Downscale such that all sides have height and width <= maxLength
-    private final int maxLength = 16;
+    private final int maxMaxLength = 16;
+    private final AlgorithmInterface brute = new BruteForceSolver();
+    private int largestSide;
+    
+    // original packing problem
+    private PackingProblem p;
+    
+    private boolean debug = false;
+    
+    DownScaleSolver(){}
+    DownScaleSolver(boolean debug){ this.debug = debug; }
     
     @Override
     public PackingSolution solve(PackingProblem p) throws InterruptedException {
-        int largestSide = Math.max(p.getLargestHeight(), p.getLargestWidth());
+        this.p = p;
+        largestSide = Math.max(p.getLargestHeight(), p.getLargestWidth());
         
-        //double scale = Math.min((double) maxLength / largestSide, 1.0);
-
+        /* With these conditions, ordinary brute-force can be ran. */
+        if ((p.largestHeight < 35 && p.largestWidth < 35) ||
+                (p.rectangles.length <= 10 && p.largestHeight < 53 && p.largestWidth < 53) ||
+                (p.rectangles.length <= 4 && p.largestHeight < 80 && p.largestWidth < 80)) {
+            return brute.solve(p);
+        }
+        
+        if (p.rectangles.length <= 6){
+            return runWithRotations(15);
+        } else {
+            return runWithDifferentMaxLengths();
+        }
+    }
+    
+    private PackingSolution runWithRotations(int maxLength) throws InterruptedException {
+        int iterations = (int) Math.pow(2, p.rectangles.length);
+        PackingSolution bestSolution = null;
+        String bestSwitches = null;
+        
+        for (int i = 0; i < iterations; i++){
+            PackingProblem newP = new PackingProblem(p);
+            String switches = Integer.toBinaryString(i);
+            
+            // whether it's possible to pack the rectangles
+            boolean impossible = false;
+            
+            for (int j = 0; j < newP.rectangles.length; j++){
+                if (j < switches.length() && switches.charAt(j) == '1'){
+                    newP.rectangles[j].rotate();
+                    if (newP.rectangles[j].getHeight() > newP.settings.maxHeight){
+                        impossible = true;
+                    }
+                }
+            }
+            
+            if (impossible){
+                continue;
+            }
+            
+            PackingSolution sol = run(newP, maxLength);
+            
+            if (debug){
+                System.out.format("Rotation %s: %d\n", switches, sol.area());
+            }
+            
+            if (bestSolution == null || sol.area() < bestSolution.area()){
+                bestSolution = sol;
+                bestSwitches = switches;
+            }
+        }
+        
+        if (debug){
+            System.out.println("--------------------");
+            System.out.format("Best rotations: %s with area %d\n", bestSwitches, bestSolution.area());
+        }
+        
+        return bestSolution;
+    }
+    
+    private PackingSolution runWithDifferentMaxLengths() throws InterruptedException {
+        PackingSolution bestSolution = null;
+        int bestMaxLength = -1;
+        
+        for (int maxLength = 2; maxLength <= maxMaxLength; maxLength++){
+            PackingSolution sol = run(new PackingProblem(p), maxLength);
+            
+            if (debug){
+                System.out.format("maxLength %d: %d\n", maxLength, sol.area());
+            }
+            
+            if (bestSolution == null || sol.area() < bestSolution.area()){
+                bestSolution = sol;
+                bestMaxLength = maxLength;
+            }
+        }
+        
+        if (debug){
+            System.out.println("--------------------");
+            System.out.format("Best maxLength: %d with area %d\n", bestMaxLength, bestSolution.area());
+        }
+        
+        return bestSolution;
+    }
+    
+    private PackingSolution run(PackingProblem p, int maxLength) throws InterruptedException {
         Fraction scale = new Fraction(maxLength, largestSide);
 
         /* If the scale is > 1, set it to 1. */
         if (scale.numerator > scale.denominator) {
             scale = Fraction.ONE;
         }
-
-        /* With these conditions, ordinary brute-force can be ran. */
-        if ((p.largestHeight < 3500 && p.largestWidth < 3500) ||
-                (p.rectangles.length <= 10 && p.largestHeight < 5300 && p.largestWidth < 5300) ||
-                (p.rectangles.length <= 4 && p.largestHeight < 8000 && p.largestWidth < 8000)) {
-            scale = Fraction.ONE;
-        }
-
-        //System.out.format("Scale %f\n", scale);
         
         PackingProblem smallP = downScale(p, scale);
-        AlgorithmInterface brute = new BruteForceSolver();
-
         PackingSolution smallSol = brute.solve(smallP);
 
         /* Invert the scale, to scale back up. */
@@ -43,8 +126,8 @@ public class DownScaleSolver implements AlgorithmInterface {
                     Fraction.mul_floor(inv_scale, r.getY()));
         }
 
-
         SteinbergSolver.shake(p);
+        
         return new PackingSolution(p);
     }
     

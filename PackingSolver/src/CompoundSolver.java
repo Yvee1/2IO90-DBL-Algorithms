@@ -35,7 +35,7 @@ public class CompoundSolver implements AlgorithmInterface {
 
         /* Run the DownScaleSolver when possible. */
         if (p.rectangles.length <= 25) {
-            solvers.add(new DownScaleSolver());
+            solvers.add(new DownScaleSolver(debug));
         }
 
         if (p.getSettings().fixed){

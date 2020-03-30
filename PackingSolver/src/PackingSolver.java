@@ -25,7 +25,8 @@ public class PackingSolver {
             // Decide which algorithm to apply
             AlgorithmInterface ai;
 //            ai = new MaxRectsSolver(new BSSF(), new DESCSS());
-            ai = new DownScaleSolver();
+//            ai = new DownScaleSolver(debug);
+            ai = new BruteForceSolver();
             try {
                 solution = ai.solve(p);
             } catch (InterruptedException e) {
