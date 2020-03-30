@@ -162,7 +162,7 @@ public class DownScaleSolver implements AlgorithmInterface {
 
         // Downscale max height, *rounds down*
         if(ps.fixed){
-            int scaledMax = Fraction.mul_floor(scale, p.settings.maxHeight);
+            int scaledMax = Math.max(Fraction.mul_floor(scale, p.settings.maxHeight), 1);
             downScaledFixedHeight = scaledMax;
             ps.setMaxHeight(scaledMax);
 //            System.out.format("Height limit: %d\n", ps.getMaxHeight());
