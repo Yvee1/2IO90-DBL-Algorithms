@@ -10,8 +10,7 @@ public class CompoundSolver implements AlgorithmInterface {
     PackingSolution bestSolution = null;
     String bestSolver = null;
 
-    PackingProblem prob[] = new PackingProblem[2];
-    int prob_idx = 0;
+    PackingProblem prob = null;
     
     CompoundSolver(){
         debug = false;
@@ -27,13 +26,12 @@ public class CompoundSolver implements AlgorithmInterface {
     public PackingSolution solve(PackingProblem p){
         //System.err.println(p.settings.rotation);
 
-        this.prob[0] = p;
-        this.prob[1] = new PackingProblem(p);
+        this.prob = p;
 
         /* Initially run BestFitFast. */
-        bestSolution = new BestFitFast().solve(p);
+        bestSolution = new BestFitFast().solve(new PackingProblem(p));
         bestSolver = "BestFitFast";
-        prob_idx = 1;
+        //prob_idx = 1;
 
         if (debug) {
             System.out.println();
@@ -59,7 +57,7 @@ public class CompoundSolver implements AlgorithmInterface {
                 binpack = true;
             }
             else if (p.settings.rotation && !p.settings.fixed) {
-                globmaxrect = bff_area <= 100000000000L;
+                globmaxrect1 = bff_area <= 100000000000L;
                 binpack = !globmaxrect;
             }
             else if (!p.settings.rotation && p.settings.fixed) {
@@ -185,7 +183,7 @@ public class CompoundSolver implements AlgorithmInterface {
 
         PackingSolution sol;
         try {
-            sol = alg.solve(prob[prob_idx]);
+            sol = alg.solve(new PackingProblem(prob));
         } catch (Exception e) {
             return;
         }
@@ -197,7 +195,6 @@ public class CompoundSolver implements AlgorithmInterface {
 
         if (sol.area() < bestSolution.area()) {
             bestSolution = sol;
-            prob_idx = (prob_idx + 1) % 2;
         }
 
     }
