@@ -14,22 +14,25 @@ public class BasicBinPacking implements AlgorithmInterface {
     // Reference to the array of rectangles that needs to be placed
     Rectangle[] rs;
     boolean rotationsAllowed;
+    boolean fixed;
     Rectangle container;
     ArrayList<Rectangle> emptySpaces = new ArrayList<>();
     
     @Override
-    public PackingSolution solve(PackingProblem pp){
-        if (pp.getSettings().fixed){
-            throw new IllegalArgumentException("BasicPinPacking: not for strip packing");
-        }
-        
+    public PackingSolution solve(PackingProblem pp){        
         rs = pp.getRectangles();
         rotationsAllowed = pp.getSettings().rotation;
+        fixed = pp.getSettings().fixed;
         // sort in decreasing 'size'
         Arrays.sort(rs, Comparator.comparing(Rectangle::getLongerSide).reversed());
         
         // initial rectangle size
-        container = new Rectangle(0, 0, rs[0].getWidth(), rs[0].getHeight());
+        if (fixed){
+            container = new Rectangle(0, 0, rs[0].getWidth(), pp.getSettings().getMaxHeight());
+        } else {
+            // begin with container with size of 'biggest' rectangle
+            container = new Rectangle(0, 0, rs[0].getWidth(), rs[0].getHeight());
+        }
         emptySpaces.add(container);
         
         for (Rectangle r : rs){
@@ -52,11 +55,19 @@ public class BasicBinPacking implements AlgorithmInterface {
             }
 
             if (!fit){
+                // rotate if it doesn't fit in container otherwise
+                if (fixed && r.getHeight() > container.getHeight() && rotationsAllowed){
+                    r.rotate();
+                } else if (fixed && r.getWidth() > r.getHeight() && r.getWidth() <= container.getHeight() && rotationsAllowed){
+                    // rotate the rectangle upright if it fits that way
+                    r.rotate();
+                }
+                
                 int rw = r.getWidth();
                 int rh = r.getHeight();
                 int cw = container.getWidth();
                 int ch = container.getHeight();
-                boolean canGrowUp = rw <= cw;
+                boolean canGrowUp = rw <= cw && !fixed;
                 boolean canGrowRight = rh <= ch;
                 
                 boolean shouldGrowUp = canGrowUp && 
@@ -89,6 +100,7 @@ public class BasicBinPacking implements AlgorithmInterface {
             }
         }
         
+        SteinbergSolver.shake(pp);
         return new PackingSolution(pp);
     }
     
