@@ -10,8 +10,8 @@ public class PackingSolver {
      * The primary function called by main
      */
     static void run() {
-        boolean multipleSolvers = false;
-        boolean debug = true;
+        boolean multipleSolvers = true;
+        boolean debug = false;
 
         // Read the problem from input
         InputReader reader = new InputReader();

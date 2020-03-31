@@ -35,18 +35,11 @@ public class DownScaleSolver implements AlgorithmInterface {
         largestSide = Math.max(p.getLargestHeight(), p.getLargestWidth());
 //        largestSide = Math.min(Math.max(p.getLargestHeight(), p.getLargestWidth()), p.settings.maxHeight);
         
-        /* With these conditions, ordinary brute-force can be ran. */
-        if (!p.settings.rotation && ((p.largestHeight < 35 && p.largestWidth < 35) ||
-                (p.rectangles.length <= 10 && p.largestHeight < 53 && p.largestWidth < 53) ||
-                (p.rectangles.length <= 4 && p.largestHeight < 80 && p.largestWidth < 80))) {
-            return brute.solve(p);
-        }
-        
         // whether brute force can solve it under ~25 seconds
         boolean runnable = false;
         if (p.rectangles.length == 25){
             if (p.settings.fixed){
-                if (p.largestHeight < 35 && p.largestWidth < 35){
+                if (p.totalHeight < 1000 && p.totalWidth < 1000){
                     runnable = true;
                 }
             } else {
@@ -58,7 +51,7 @@ public class DownScaleSolver implements AlgorithmInterface {
         
         if (p.rectangles.length == 10){
             if (p.settings.fixed){
-                if (p.largestHeight < 50 && p.largestWidth < 50){
+                if (p.totalHeight < 1000 && p.totalWidth < 1000){
                     runnable = true;
                 }
             } else {
@@ -70,7 +63,7 @@ public class DownScaleSolver implements AlgorithmInterface {
         
         if (p.rectangles.length == 6){
             if (p.settings.fixed){
-                if (p.largestHeight < 500 && p.largestWidth < 500){
+                if (p.totalHeight < 5000 && p.totalWidth < 5000){
                     runnable = true;
                 }
             } else {
@@ -82,7 +75,7 @@ public class DownScaleSolver implements AlgorithmInterface {
         
         if (p.rectangles.length == 4){
             if (p.settings.fixed){
-                if (p.largestHeight < 1000 && p.largestWidth < 1000){
+                if (p.totalHeight < 10000 && p.totalWidth < 10000){
                     runnable = true;
                 }
             } else {

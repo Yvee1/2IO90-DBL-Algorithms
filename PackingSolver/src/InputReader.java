@@ -36,6 +36,8 @@ public class InputReader {
         PackingSettings settings = new PackingSettings();
         int largestWidth = -1;
         int largestHeight = -1;
+        int totalWidth = 0;
+        int totalHeight = 0;
 
         /* Skip "container height:" */
         sc.next();
@@ -72,6 +74,9 @@ public class InputReader {
 
             if (r[i].h > settings.maxHeight) { r[i].rotate(); }
 
+            totalWidth += width;
+            totalHeight += height;
+            
             if (width > largestWidth) { largestWidth = width; }
             if (height > largestHeight) { largestHeight = height; }
         }
@@ -79,6 +84,8 @@ public class InputReader {
         PackingProblem p = new PackingProblem(settings, r);
         p.largestWidth = largestWidth;
         p.largestHeight = largestHeight;
+        p.totalWidth = totalWidth;
+        p.totalHeight = totalHeight;
 
         return p;
     }

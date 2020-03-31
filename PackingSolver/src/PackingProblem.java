@@ -9,6 +9,8 @@ public class PackingProblem {
 
     public int largestWidth;
     public int largestHeight;
+    public int totalWidth;
+    public int totalHeight;
 
     public PackingProblem(PackingSettings settings, Rectangle[] rectangles) {
         this.settings = settings;
@@ -26,6 +28,8 @@ public class PackingProblem {
         this.rectangles = rs;
         this.largestWidth = p.largestWidth;
         this.largestHeight = p.largestHeight;
+        this.totalWidth = p.totalWidth;
+        this.totalHeight = p.totalHeight;
     }
 
     public PackingSettings getSettings() { return this.settings; }
