@@ -58,7 +58,7 @@ public class CompoundSolver implements AlgorithmInterface {
             }
             else if (p.settings.rotation && !p.settings.fixed) {
                 globmaxrect1 = bff_area <= 100000000000L;
-                binpack = !globmaxrect;
+                binpack = !globmaxrect1;
             }
             else if (!p.settings.rotation && p.settings.fixed) {
                 steinberg = bff_area == 262393686;
