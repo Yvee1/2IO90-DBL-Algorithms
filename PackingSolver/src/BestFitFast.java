@@ -32,6 +32,8 @@ public class BestFitFast implements AlgorithmInterface {
             }
         });
 
+        int max_h = -1, max_w = -1;
+
         usedRectangles = new Rectangle[p.getRectangles().length];
         topSegments = new SkylineSegment[p.getRectangles().length];
 
@@ -85,6 +87,10 @@ public class BestFitFast implements AlgorithmInterface {
             /* Set the placed rectangle's position. */
             w.orig.setPos(segment.x, segment.y);
 
+            /* Set max width and height. */
+            max_h = Math.max(max_h, w.orig.y + w.orig.h);
+            max_w = Math.max(max_w, w.orig.x + w.orig.w);
+
             updateSkyline(w.orig, segment);
 
             /* Remove the rectangles from the bst. */
@@ -99,8 +105,8 @@ public class BestFitFast implements AlgorithmInterface {
 //        }
 
         p.rectangles = usedRectangles;
-
-        return new PackingSolution(p);
+        
+        return new PackingSolution(p, max_w, max_h);
 
     }
 
