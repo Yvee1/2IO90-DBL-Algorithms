@@ -41,12 +41,11 @@ public class CompoundSolver implements AlgorithmInterface {
         long bff_area = bestSolution.area();
 
         boolean steinberg, globmaxrect, globmaxrect1, binpack, downscale, maxrects, brute;
-        steinberg = true;
-        globmaxrect = globmaxrect1 = binpack = downscale = maxrects = brute = false;
+        steinberg = globmaxrect = globmaxrect1 = binpack = downscale = maxrects = brute = false;
 
         /* Everything is safe for 25 or fewer rectangles. */
         if (p.rectangles.length <= 25) {
-            binpack = globmaxrect = globmaxrect1 = downscale = maxrects = true;
+            steinberg = binpack = globmaxrect = globmaxrect1 = downscale = maxrects = true;
             if (bff_area == 2112) { brute = true; downscale = false; }
         }
         else {
@@ -59,6 +58,7 @@ public class CompoundSolver implements AlgorithmInterface {
                 binpack = !globmaxrect;
             }
             else if (!p.settings.rotation && p.settings.fixed) {
+                steinberg = true;
                 binpack = true;
             }
             else if (!p.settings.rotation && !p.settings.fixed) {
@@ -66,6 +66,8 @@ public class CompoundSolver implements AlgorithmInterface {
                 binpack = !globmaxrect1;
             }
         }
+
+        System.err.println(bff_area);
 
         if (steinberg) { run_alg(new SteinbergSolver(), false); }
         if (downscale) { run_alg(new DownScaleSolver(), true); }
@@ -174,6 +176,8 @@ public class CompoundSolver implements AlgorithmInterface {
 
     private void run_alg(AlgorithmInterface alg, boolean verify) {
         long start_t = System.currentTimeMillis();
+
+        System.err.println(alg.getClass().getName());
 
         PackingSolution sol;
         try {
