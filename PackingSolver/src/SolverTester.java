@@ -197,7 +197,7 @@ public class SolverTester {
         }
 
         private double calculateDensity(PackingSolution sol) {
-            area = sol.area();
+            area = (int) sol.area();
             usedSpace = 0;
             for (Rectangle r : sol.problem.getRectangles()) {
                 usedSpace += r.getArea();

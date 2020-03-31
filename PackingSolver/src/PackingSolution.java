@@ -33,11 +33,11 @@ public class PackingSolution {
         this.orderedRectangles = orderedRectangles;
     }
 
-    public int area(){
+    public long area(){
         if (problem.settings.fixed){
-            return width * problem.settings.maxHeight;
+            return ((long) width) * problem.settings.maxHeight;
         } else {
-            return width * height;
+            return ((long) width) * height;
         }
     }
     
@@ -60,5 +60,20 @@ public class PackingSolution {
         }
         
         return hasOverlap;
+    }
+
+    public boolean isValid() {
+        Rectangle[] l = problem.rectangles;
+        for (int i = 0; i < l.length; i++) {
+
+            if (l[i].y + l[i].h > problem.settings.maxHeight) { return false; }
+
+            /* The solvers shouldn't have any overlap. */
+//            for (int j = i+1; j < l.length; j++) {
+//                if (Rectangle.overlaps(l[i], l[j])) { return false; }
+//            }
+
+        }
+        return true;
     }
 }
