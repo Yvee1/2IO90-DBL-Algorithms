@@ -67,7 +67,7 @@ public class CompoundSolver implements AlgorithmInterface {
             }
         }
 
-        System.err.println(bff_area);
+        System.err.println("BestFitFast: " + bff_area);
 
         if (steinberg) { run_alg(new SteinbergSolver(), false); }
         if (downscale) { run_alg(new DownScaleSolver(), true); }
@@ -177,8 +177,6 @@ public class CompoundSolver implements AlgorithmInterface {
     private void run_alg(AlgorithmInterface alg, boolean verify) {
         long start_t = System.currentTimeMillis();
 
-        System.err.println(alg.getClass().getName());
-
         PackingSolution sol;
         try {
             sol = alg.solve(prob);
@@ -188,6 +186,8 @@ public class CompoundSolver implements AlgorithmInterface {
 
         /* If the solution is not valid, skip. */
         if (verify && !sol.isValid()) { return; }
+
+        System.err.println(alg.getClass().getName() + ": " + sol.area());
 
         if (sol.area() < bestSolution.area()) {
             bestSolution = sol;
