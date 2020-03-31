@@ -10,7 +10,8 @@ public class CompoundSolver implements AlgorithmInterface {
     PackingSolution bestSolution = null;
     String bestSolver = null;
 
-    PackingProblem prob;
+    PackingProblem prob[] = new PackingProblem[2];
+    int prob_idx = 0;
     
     CompoundSolver(){
         debug = false;
@@ -26,7 +27,8 @@ public class CompoundSolver implements AlgorithmInterface {
     public PackingSolution solve(PackingProblem p){
         //System.err.println(p.settings.rotation);
 
-        this.prob = p;
+        this.prob[0] = p;
+        this.prob[1] = new PackingProblem(p);
 
         /* Initially run BestFitFast. */
         bestSolution = new BestFitFast().solve(new PackingProblem(p));
@@ -179,7 +181,7 @@ public class CompoundSolver implements AlgorithmInterface {
 
         PackingSolution sol;
         try {
-            sol = alg.solve(prob);
+            sol = alg.solve(prob[prob_idx]);
         } catch (Exception e) {
             return;
         }
@@ -191,6 +193,7 @@ public class CompoundSolver implements AlgorithmInterface {
 
         if (sol.area() < bestSolution.area()) {
             bestSolution = sol;
+            prob_idx = (prob_idx + 1) % 2;
         }
 
     }
