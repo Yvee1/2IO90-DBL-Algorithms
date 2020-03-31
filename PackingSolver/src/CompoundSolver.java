@@ -31,8 +31,10 @@ public class CompoundSolver implements AlgorithmInterface {
         this.prob[1] = new PackingProblem(p);
 
         /* Initially run BestFitFast. */
-        bestSolution = new BestFitFast().solve(new PackingProblem(p));
+        bestSolution = new BestFitFast().solve(p);
         bestSolver = "BestFitFast";
+        prob_idx = 1;
+
         if (debug) {
             System.out.println();
             System.out.println(bestSolver);
