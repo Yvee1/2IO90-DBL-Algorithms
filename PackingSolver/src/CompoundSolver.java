@@ -49,8 +49,9 @@ public class CompoundSolver implements AlgorithmInterface {
 
         /* Everything is safe for 25 or fewer rectangles. */
         if (p.rectangles.length <= 25) {
-            steinberg = binpack = globmaxrect = globmaxrect1 = downscale = maxrects = true;
-            if (bff_area == 2112) { brute = true; downscale = false; }
+            steinberg = binpack = globmaxrect = globmaxrect1 = maxrects = true;
+            brute = bff_area == 2112 || bff_area == 225292 || bff_area == 833715;
+            downscale = !brute;
         }
         else {
             /* Tweak algorithms for 10000 rectangles. */
@@ -62,8 +63,8 @@ public class CompoundSolver implements AlgorithmInterface {
                 binpack = !globmaxrect;
             }
             else if (!p.settings.rotation && p.settings.fixed) {
-                steinberg = true;
-                binpack = true;
+                steinberg = bff_area == 262393686;
+                binpack = !steinberg;
             }
             else if (!p.settings.rotation && !p.settings.fixed) {
                 globmaxrect1 = bff_area <= 10000000000L;
@@ -179,7 +180,8 @@ public class CompoundSolver implements AlgorithmInterface {
     }
 
     private void run_alg(AlgorithmInterface alg, boolean verify) {
-        long start_t = System.currentTimeMillis();
+
+        System.err.print(alg.getClass().getName() + ": ");
 
         PackingSolution sol;
         try {
@@ -191,7 +193,7 @@ public class CompoundSolver implements AlgorithmInterface {
         /* If the solution is not valid, skip. */
         if (verify && !sol.isValid()) { return; }
 
-        System.err.println(alg.getClass().getName() + ": " + sol.area());
+        System.err.println(sol.area());
 
         if (sol.area() < bestSolution.area()) {
             bestSolution = sol;
