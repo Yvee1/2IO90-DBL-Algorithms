@@ -1,6 +1,6 @@
 /**
  *
- * @author Steven van den Broek
+ * @author Steven van den Broek & Martijn Leus
  */
 
 public class DownScaleSolver implements AlgorithmInterface {
@@ -36,25 +36,86 @@ public class DownScaleSolver implements AlgorithmInterface {
 //        largestSide = Math.min(Math.max(p.getLargestHeight(), p.getLargestWidth()), p.settings.maxHeight);
         
         /* With these conditions, ordinary brute-force can be ran. */
-        if (!p.settings.rotation && (p.largestHeight < 35 && p.largestWidth < 35) ||
+        if (!p.settings.rotation && ((p.largestHeight < 35 && p.largestWidth < 35) ||
                 (p.rectangles.length <= 10 && p.largestHeight < 53 && p.largestWidth < 53) ||
-                (p.rectangles.length <= 4 && p.largestHeight < 80 && p.largestWidth < 80)) {
+                (p.rectangles.length <= 4 && p.largestHeight < 80 && p.largestWidth < 80))) {
             return brute.solve(p);
         }
         
-        if (p.rectangles.length <= 6 && p.settings.rotation){
-            return runWithRotations(15);
+        // whether brute force can solve it under ~25 seconds
+        boolean runnable = false;
+        if (p.rectangles.length == 25){
+            if (p.settings.fixed){
+                if (p.largestHeight < 35 && p.largestWidth < 35){
+                    runnable = true;
+                }
+            } else {
+                if (p.largestHeight < 5 && p.largestWidth < 5){
+                    runnable = true;
+                }
+            }
+        }
+        
+        if (p.rectangles.length == 10){
+            if (p.settings.fixed){
+                if (p.largestHeight < 50 && p.largestWidth < 50){
+                    runnable = true;
+                }
+            } else {
+                if (p.largestHeight < 10 && p.largestWidth < 10){
+                    runnable = true;
+                }
+            }
+        }
+        
+        if (p.rectangles.length == 6){
+            if (p.settings.fixed){
+                if (p.largestHeight < 500 && p.largestWidth < 500){
+                    runnable = true;
+                }
+            } else {
+                if (p.largestHeight < 30 && p.largestWidth < 30){
+                    runnable = true;
+                }
+            }
+        }
+        
+        if (p.rectangles.length == 4){
+            if (p.settings.fixed){
+                if (p.largestHeight < 1000 && p.largestWidth < 1000){
+                    runnable = true;
+                }
+            } else {
+                if (p.largestHeight < 40 && p.largestWidth < 40){
+                    runnable = true;
+                }
+            }
+        }
+        
+        // if no rotations and possible to solver, just run brute
+        if (runnable && !p.settings.rotation){
+            return brute.solve(p);
+        } else if (runnable && p.settings.rotation) {
+            // if possible to solve and rotations allowed
+            // run normal scale brute force with different rotations
+            return runRotationsWithDifferentMaxLengths(largestSide);
+        } else if (p.rectangles.length <= 10 && p.settings.rotation){
+            // if not possible to solve by brute force on normal scale
+            // and rotations are allowed. Just start with maxLength 10
+            return runRotationsWithDifferentMaxLengths(10);
         } else {
-            return runWithDifferentMaxLengths();
+            // if no rotations allowed and not possible to solve by
+            // brute force on normal scale. Start with maxLength=10 downscaling
+            return runWithDifferentMaxLengths(10);
         }
     }
     
-    private PackingSolution runWithRotations(int maxLength) throws InterruptedException {
+    private PackingSolution runWithRotations(PackingProblem p, int maxLength, long timeLeft) throws InterruptedException {
         int iterations = (int) Math.pow(2, p.rectangles.length);
         PackingSolution bestSolution = null;
         String bestSwitches = null;
         
-        for (int i = 0; i < iterations; i++){
+        for (int i = 0; i < iterations && timeLeft > 0; i++, timeLeft = endTime - System.currentTimeMillis()){
             PackingProblem newP = new PackingProblem(p);
             String switches = Integer.toBinaryString(i);
             
@@ -73,8 +134,8 @@ public class DownScaleSolver implements AlgorithmInterface {
             if (impossible){
                 continue;
             }
-            
-            PackingSolution sol = run(newP, maxLength, maxRunTime);
+            System.out.println(timeLeft);
+            PackingSolution sol = run(newP, maxLength, timeLeft);
             
             if (debug){
                 System.out.format("Rotation %s: %d\n", switches, sol.area());
@@ -94,14 +155,41 @@ public class DownScaleSolver implements AlgorithmInterface {
         return bestSolution;
     }
     
-    private PackingSolution runWithDifferentMaxLengths() throws InterruptedException {
+    private PackingSolution runWithDifferentMaxLengths(int startLength) throws InterruptedException {
         PackingSolution bestSolution = null;
         int bestMaxLength = -1;
 
         long timeLeft = maxRunTime;
         
-        for (int maxLength = 2; timeLeft > 0; maxLength++, timeLeft = endTime - System.currentTimeMillis()){
+        for (int maxLength = startLength; timeLeft > 0; maxLength++, timeLeft = endTime - System.currentTimeMillis()){
             PackingSolution sol = run(new PackingProblem(p), maxLength, timeLeft);
+                     
+            if (debug){
+                System.out.format("maxLength %d: %d\n", maxLength, sol.area());
+            }
+            
+            if (bestSolution == null || sol.area() < bestSolution.area()){
+                bestSolution = sol;
+                bestMaxLength = maxLength;
+            }
+        }
+        
+        if (debug){
+            System.out.println("--------------------");
+            System.out.format("Best maxLength: %d with area %d\n", bestMaxLength, bestSolution.area());
+        }
+        
+        return bestSolution;
+    }
+    
+    private PackingSolution runRotationsWithDifferentMaxLengths(int startLength) throws InterruptedException {
+        PackingSolution bestSolution = null;
+        int bestMaxLength = -1;
+
+        long timeLeft = maxRunTime;
+        
+        for (int maxLength = startLength; timeLeft > 0; maxLength++, timeLeft = endTime - System.currentTimeMillis()){
+            PackingSolution sol = runWithRotations(new PackingProblem(p), maxLength, timeLeft);
                      
             if (debug){
                 System.out.format("maxLength %d: %d\n", maxLength, sol.area());

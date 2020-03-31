@@ -11,7 +11,7 @@ public class PackingSolver {
      */
     static void run() {
         boolean multipleSolvers = false;
-        boolean debug = false;
+        boolean debug = true;
 
         // Read the problem from input
         InputReader reader = new InputReader();
@@ -27,6 +27,7 @@ public class PackingSolver {
 //            ai = new MaxRectsSolver(new BSSF(), new DESCSS());
             ai = new DownScaleSolver(debug);
 //            ai = new BruteForceSolver();
+//            ai = new BasicBinPacking();
             try {
                 solution = ai.solve(p);
             } catch (InterruptedException e) {

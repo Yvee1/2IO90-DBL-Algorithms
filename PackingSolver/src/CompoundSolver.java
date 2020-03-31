@@ -19,6 +19,7 @@ public class CompoundSolver implements AlgorithmInterface {
     
     @Override
     public PackingSolution solve(PackingProblem p){
+        System.err.println(p.settings.fixed);
         PackingSolution bestSolution = null;
         String bestSolver = null;
 
@@ -37,7 +38,8 @@ public class CompoundSolver implements AlgorithmInterface {
 
         /* Run the DownScaleSolver when possible. */
         if (p.rectangles.length <= 25) {
-            solvers.add(new DownScaleSolver(debug));
+            solvers.add(new BasicBinPacking());
+            solvers.add(new DownScaleSolver(false));
         }
 
         if (p.getSettings().fixed){
@@ -64,10 +66,6 @@ public class CompoundSolver implements AlgorithmInterface {
                 for (MaxRectsHeuristicSubroutine mrhs : mrhss){
                     solvers.add(new MaxRectsSolver(mrhs, mrss));
                 }
-            }
-            
-            if (!p.getSettings().fixed){
-                solvers.add(new BasicBinPacking());
             }
         } else {
 //            solvers.add(new MaxRectsSolver(new BSSF(), new DESCSS()));
