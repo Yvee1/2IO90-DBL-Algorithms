@@ -134,7 +134,6 @@ public class DownScaleSolver implements AlgorithmInterface {
             if (impossible){
                 continue;
             }
-            System.out.println(timeLeft);
             PackingSolution sol = run(newP, maxLength, timeLeft);
             
             if (debug){
