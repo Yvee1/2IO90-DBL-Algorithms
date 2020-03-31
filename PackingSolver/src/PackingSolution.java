@@ -34,7 +34,11 @@ public class PackingSolution {
     }
 
     public int area(){
-        return width * height;
+        if (problem.settings.fixed){
+            return width * problem.settings.maxHeight;
+        } else {
+            return width * height;
+        }
     }
     
     public double density(){
