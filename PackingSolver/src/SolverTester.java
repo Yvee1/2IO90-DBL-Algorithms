@@ -6,9 +6,9 @@ public class SolverTester {
 
     // STOP JE SOLVER IN MAIN()
     // VUL HIER IN WELKE TEST CASES
-    private String cases = "crash_steinberg.txt";
+    private String cases = "";
     // Open visualizer als overlap of height limit exceeded is?
-    private boolean visualizeOnInvalidSolution = true;
+    private boolean visualizeOnInvalidSolution = false;
     // e.g. "" leeg voor alle test cases
     // e.g. "AH" voor alle test cases onder "\AH\"
     // of "AH, N" voor alle test cases onder "\AH\" en "\N\"
@@ -25,13 +25,15 @@ public class SolverTester {
     public SolverTester(AlgorithmInterface ai) {
         algorithm = ai;
         printer = new OutputPrinter();
-        testCasesPath = "C:\\Users\\Vincent\\Documents\\__git\\2IO90-DBL-Algorithms\\Testcases\\";
+        testCasesPath = "D:\\2IO90-DBL-Algorithms\\Testcases\\";
         testCases = new ArrayList<>();
     }
 
     public void run() throws Exception {
         addTestCase(cases);
         double avgDens = 0;
+        // the average time in ms
+        long avgTime = 0;
         int i = 1;
         int j = 0;
         for (TestCase tc : testCases) {
@@ -67,9 +69,12 @@ public class SolverTester {
             System.out.println("");
             avgDens += tc.getDensity();
             i++;
+            avgTime += dur;
         }
         avgDens /= (i - j - 1);
+        avgTime /= (i - j - 1);
         System.out.println("Average Density: " + avgDens);
+        System.out.println("Average Time: " + avgTime + "ms");
         stop();
     }
 
@@ -141,7 +146,7 @@ public class SolverTester {
     }
 
     public static void main(String args[]) throws Exception {
-        SolverTester st = new SolverTester(new SteinbergSolver());
+        SolverTester st = new SolverTester(new BestFitFast());
         st.run();
     }
 
@@ -160,6 +165,9 @@ public class SolverTester {
             algo = ai;
             InputReader reader = new InputReader();
             problem = reader.readFile(file);
+            
+            //possible adapt the problem to fit certain cases
+//            problem.setSettings(new PackingSettings(false, true));
         }
 
         public PackingProblem getProblem() {

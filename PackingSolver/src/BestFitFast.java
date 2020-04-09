@@ -232,7 +232,7 @@ public class BestFitFast implements AlgorithmInterface {
             /* If the right edge is positioned to the left of the current width, then there is a previously */
             /* rotated rectangle at the current width, hence we are done. */
             if (r.h >= r.w || r.w > p.settings.maxHeight || r.x+r.w < width) { return; }
-
+            
             /* Save the rectangle's position if revert is needed. */
             int x_cache = r.x;
             int y_cache = r.y;

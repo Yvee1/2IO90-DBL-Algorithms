@@ -15,6 +15,13 @@ public class PackingSettings {
 
     public PackingSettings() {}
 
+    //this case is only used for the SolverTester
+    public PackingSettings(boolean fixed, boolean rotation) {
+        this.fixed = fixed;
+        this.rotation = rotation;
+    }
+    
+
     public PackingSettings(boolean fixed, boolean rotation, int n) {
         this.fixed = fixed;
         this.rotation = rotation;
